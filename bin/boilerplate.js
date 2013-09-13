@@ -7,9 +7,10 @@
  * @author Author <email@email.com>
  */
 
+var GH_PATH = process.env.GH_PATH;
+
 // -- Requires -----------------------------------------------------------------
-var GH_PATH = process.env.GH_PATH,
-    logger = require(GH_PATH + 'lib/logger');
+var logger = require(GH_PATH + 'lib/logger');
 
 // -- Constructor --------------------------------------------------------------
 function Boilerplate(options) {
