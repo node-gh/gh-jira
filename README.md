@@ -53,4 +53,4 @@ gh bo --foo
 
 ## License
 
-[MIT License](http://opensource.org/licenses/MIT)
+[BSD License](https://github.com/node-gh/gh/blob/master/LICENSE.md)
