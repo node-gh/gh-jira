@@ -7,7 +7,7 @@
         "email": "email@email.com",
         "web": "http://www.nodegh.io"
     },
-    "license": "MIT",
+    "license": "BSD",
     "repository": {
         "type": "git",
         "url": "git@github.com:node-gh/gh-boilerplate.git"
