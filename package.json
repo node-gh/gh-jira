@@ -5,8 +5,23 @@
     "author": {
         "name": "Author",
         "email": "email@email.com",
-        "web": "http://www.nodegh.io"
+        "web": "http://www.nodegh.io",
+        "twitter": "author"
     },
+    "contributors": [
+        {
+            "name": "Eduardo Lundgren",
+            "email": "eduardolundgren@gmail.com",
+            "web": "http://www.eduardo.io",
+            "twitter": "eduardolundgren"
+        },
+        {
+            "name": "Zeno Rocha",
+            "email": "zno.rocha@gmail.com",
+            "web": "http://zenorocha.com",
+            "twitter": "zenorocha"
+        }
+    ],
     "license": "BSD",
     "repository": {
         "type": "git",
@@ -21,6 +36,14 @@
     "bin": {
         "gh-bo": "bin/boilerplate.js",
         "gh-boilerplate": "bin/boilerplate.js"
+    },
+    "scripts": {
+        "lint": "node_modules/.bin/jshint bin/ test/",
+        "test": "node_modules/.bin/mocha --reporter list"
+    },
+    "devDependencies": {
+        "jshint": "2.1.2",
+        "mocha": "1.12.0"
     },
     "engines": {
         "node": ">=0.8"

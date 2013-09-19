@@ -1,4 +1,4 @@
-# GH Jira [![NPM version](https://badge.fury.io/js/gh-jira.png)](http://badge.fury.io/js/gh-jira) [![Dependency Status](https://david-dm.org/node-gh/gh-jira.png)](https://david-dm.org/node-gh/gh-jira)
+# GH Jira [![Build Status](https://secure.travis-ci.org/node-gh/gh-jira.png?branch=master)](https://travis-ci.org/node-gh/gh-jira) [![NPM version](https://badge.fury.io/js/gh-jira.png)](http://badge.fury.io/js/gh-jira) [![Dependency Status](https://david-dm.org/node-gh/gh-jira.png)](https://david-dm.org/node-gh/gh-jira)
 
 ![Inspectocat](http://zno.io/RNPr/inspectocat.png)
 
@@ -37,6 +37,22 @@ gh bo
 	```
 gh bo --foo
 	```
+
+## Testing
+
+Check [Travis](https://travis-ci.org/node-gh/gh-jira) for continous integration results.
+
+* Run [JSHint](http://www.jshint.com/), a tool to detect errors and potential problems.
+
+    ```
+npm run-script lint
+    ```
+
+* Run [Mocha](http://visionmedia.github.io/mocha/), a unit test framework.
+
+    ```
+npm run-script test
+    ```
 
 ## Contributing
 
