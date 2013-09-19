@@ -20,6 +20,9 @@ function Boilerplate(options) {
 // -- Constants ----------------------------------------------------------------
 Boilerplate.DETAILS = {
     alias: 'bo',
+    commands: [
+        'foo'
+    ],
     description: 'Plugin example. Copy to start a new plugin.',
     options: {
         'foo': Boolean
