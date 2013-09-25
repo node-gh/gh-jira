@@ -157,6 +157,39 @@ Jira.prototype.getIssue_ = function(issueNumber, opt_callback) {
     });
 };
 
+Jira.prototype.getIssueTypeByName_ = function(name, opt_callback) {
+    var instance = this,
+        issueType,
+        operations,
+        types;
+
+    operations = [
+        function(callback) {
+            instance.getIssueTypes_(function(err, data) {
+                if (!err) {
+                    types = data;
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            issueType = instance.findFirstArrayValue_(types, 'name', name);
+            callback();
+        }
+    ];
+
+    async.series(operations, function(err) {
+        opt_callback && opt_callback(err, issueType);
+    });
+};
+
+Jira.prototype.getIssueTypes_ = function(opt_callback) {
+    var instance = this;
+
+    instance.api.listIssueTypes(function(err, types) {
+        opt_callback && opt_callback(err, types);
+    });
+};
 Jira.prototype.new = function(opt_callback) {
     var instance = this,
         options = instance.options,
