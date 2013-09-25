@@ -6,7 +6,7 @@
  * Code licensed under the BSD License:
  * https://github.com/node-gh/gh/blob/master/LICENSE.md
  *
- * @author Author <email@email.com>
+ * @author Eduardo Lundgren <eduardolundgren@gmail.com>
  */
 
 var GH_PATH = process.env.GH_PATH;
