@@ -88,8 +88,9 @@ Jira.prototype.comment = function(opt_callback) {
             });
         },
         function(callback) {
-            options.comment = logger.applyReplacements(options.comment) +
-                '{markdown}' + instance.expandEmojiToHtml_(config.signature) + '{markdown}';
+            options.comment = '{markdown}' +
+                logger.applyReplacements(options.comment) +
+                instance.expandEmojiToHtml_(config.signature) + '{markdown}';
 
             instance.api.addComment(issue.id, options.comment, callback);
         }
