@@ -34,8 +34,8 @@
         "gh", "nodegh", "boilerplate", "plugin"
     ],
     "bin": {
-        "gh-bo": "bin/boilerplate.js",
-        "gh-boilerplate": "bin/boilerplate.js"
+        "gh-ji": "bin/jira.js",
+        "gh-jira": "bin/jira.js"
     },
     "scripts": {
         "lint": "node_modules/.bin/jshint bin/ test/",
