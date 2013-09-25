@@ -233,6 +233,40 @@ Jira.prototype.getProject_ = function(name, opt_callback) {
     });
 };
 
+Jira.prototype.getProjectComponentByName_ = function(project, name, opt_callback) {
+    var instance = this,
+        component,
+        components,
+        operations;
+
+    operations = [
+        function(callback) {
+            instance.getProjectComponents_(project, function(err, data) {
+                if (!err) {
+                    components = data;
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            component = instance.findFirstArrayValue_(components, 'name', name);
+            callback();
+        }
+    ];
+
+    async.series(operations, function(err) {
+        opt_callback && opt_callback(err, component);
+    });
+};
+
+Jira.prototype.getProjectComponents_ = function(project, opt_callback) {
+    var instance = this;
+
+    instance.api.listComponents(project, function(err, components) {
+        opt_callback && opt_callback(err, components);
+    });
+};
+
 Jira.prototype.new = function(opt_callback) {
     var instance = this,
         options = instance.options,
