@@ -43,12 +43,16 @@ Jira.DETAILS = {
 };
 
 // -- Commands -----------------------------------------------------------------
+Jira.prototype.api = null;
+
 Jira.prototype.run = function() {
     var instance = this,
+        config = base.getGlobalConfig(),
         options = instance.options;
 
-    if (options.foo) {
-        logger.log(instance.foo());
+    instance.api = new jira.JiraApi(
+        config.jira.protocol, config.jira.host, config.jira.port,
+        config.jira.user, config.jira.password, config.jira.api_version);
     }
 };
 

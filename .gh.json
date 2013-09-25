@@ -1,0 +1,10 @@
+{
+    "jira": {
+        "api_version": "2",
+        "host": "",
+        "password": "",
+        "port": "",
+        "protocol": "https",
+        "user": ""
+    }
+}
