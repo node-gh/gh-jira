@@ -77,6 +77,12 @@ Jira.prototype.run = function() {
 
     instance.registerLoggerHelpers_();
 
+    options.assignee = options.assignee || config.jira.user;
+    options.project = options.project || config.jira.default_project;
+    options.reporter = options.reporter || config.jira.user;
+    options.type = options.type || config.jira.default_issue_type;
+    options.version = options.version || config.jira.default_issue_version[options.project];
+
     if (options.comment) {
         logger.logTemplate(
             '{{prefix}} [info] Adding comment on issue {{greenBright "#" options.number}}', {
