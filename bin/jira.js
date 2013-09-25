@@ -29,16 +29,37 @@ Jira.DETAILS = {
     alias: 'ji',
     iterative: 'number',
     commands: [
-        'comment'
+        'comment',
+        'new'
     ],
     description: 'NodeGH plugin for integrating Jira, an issue management system.',
     options: {
+        'assignee': String,
         'comment': String,
-        'number': [String, Array]
+        'component': String,
+        'message': String,
+        'new': Boolean,
+        'number': [String, Array],
+        'priority': String,
+        'project': String,
+        'reporter': String,
+        'title': String,
+        'type': String,
+        'version': String
     },
     shorthands: {
+        'A': ['--assignee'],
         'c': ['--comment'],
-        'n': ['--number']
+        'C': ['--component'],
+        'm': ['--message'],
+        'N': ['--new'],
+        'n': ['--number'],
+        'p': ['--project'],
+        'P': ['--priority'],
+        'R': ['--reporter'],
+        'T': ['--type'],
+        't': ['--title'],
+        'v': ['--version']
     }
 };
 
