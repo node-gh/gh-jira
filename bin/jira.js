@@ -267,6 +267,40 @@ Jira.prototype.getProjectComponents_ = function(project, opt_callback) {
     });
 };
 
+Jira.prototype.getVersionByName_ = function(project, name, opt_callback) {
+    var instance = this,
+        operations,
+        version,
+        versions;
+
+    operations = [
+        function(callback) {
+            instance.getVersions_(project, function(err, data) {
+                if (!err) {
+                    versions = data;
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            version = instance.findFirstArrayValue_(versions, 'name', name);
+            callback();
+        }
+    ];
+
+    async.series(operations, function(err) {
+        opt_callback && opt_callback(err, version);
+    });
+};
+
+Jira.prototype.getVersions_ = function(project, opt_callback) {
+    var instance = this;
+
+    instance.api.getVersions(project, function(err, types) {
+        opt_callback && opt_callback(err, types);
+    });
+};
+
 Jira.prototype.new = function(opt_callback) {
     var instance = this,
         options = instance.options,
