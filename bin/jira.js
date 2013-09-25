@@ -73,7 +73,6 @@ Jira.prototype.run = function() {
 
 Jira.prototype.comment = function(opt_callback) {
     var instance = this,
-        config = base.getGlobalConfig(),
         options = instance.options,
         issue,
         operations;
@@ -88,9 +87,8 @@ Jira.prototype.comment = function(opt_callback) {
             });
         },
         function(callback) {
-            options.comment = '{markdown}' +
-                logger.applyReplacements(options.comment) +
-                instance.expandEmoji_(config.signature) + '{markdown}';
+            options.comment = instance.expandComment_(
+                logger.applyReplacements(options.comment));
 
             instance.api.addComment(issue.id, options.comment, callback);
         }
@@ -99,6 +97,13 @@ Jira.prototype.comment = function(opt_callback) {
     async.series(operations, function(err) {
         opt_callback && opt_callback(err);
     });
+};
+
+Jira.prototype.expandComment_ = function(comment) {
+    var instance = this,
+        config = base.getGlobalConfig();
+
+    return '{markdown}' + comment + instance.expandEmoji_(config.signature) + '{markdown}';
 };
 
 Jira.prototype.expandEmoji_ = function(content) {
