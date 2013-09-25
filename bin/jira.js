@@ -9,24 +9,28 @@
  * @author Author <email@email.com>
  */
 
-// -- Environment --------------------------------------------------------------
 var GH_PATH = process.env.GH_PATH;
 
 // -- Requires -----------------------------------------------------------------
-var logger = require(GH_PATH + 'lib/logger');
+var async = require('async'),
+    jira = require('jira'),
+    url = require('url'),
+    base = require(GH_PATH + 'lib/base'),
+    logger = require(GH_PATH + 'lib/logger');
 
 // -- Constructor --------------------------------------------------------------
-function Boilerplate(options) {
+
+function Jira(options) {
     this.options = options;
 }
 
 // -- Constants ----------------------------------------------------------------
-Boilerplate.DETAILS = {
-    alias: 'bo',
+Jira.DETAILS = {
+    alias: 'ji',
     commands: [
         'foo'
     ],
-    description: 'Plugin example. Copy to start a new plugin.',
+    description: 'NodeGH plugin for integrating Jira, an issue management system.',
     options: {
         'foo': Boolean
     },
@@ -39,7 +43,7 @@ Boilerplate.DETAILS = {
 };
 
 // -- Commands -----------------------------------------------------------------
-Boilerplate.prototype.run = function() {
+Jira.prototype.run = function() {
     var instance = this,
         options = instance.options;
 
@@ -52,4 +56,4 @@ Boilerplate.prototype.foo = function() {
     return 'NodeGH plugin boilerplate :)';
 };
 
-exports.Impl = Boilerplate;
+exports.Impl = Jira;
