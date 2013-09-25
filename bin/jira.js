@@ -90,7 +90,7 @@ Jira.prototype.comment = function(opt_callback) {
         function(callback) {
             options.comment = '{markdown}' +
                 logger.applyReplacements(options.comment) +
-                instance.expandEmojiToHtml_(config.signature) + '{markdown}';
+                instance.expandEmoji_(config.signature) + '{markdown}';
 
             instance.api.addComment(issue.id, options.comment, callback);
         }
@@ -101,7 +101,7 @@ Jira.prototype.comment = function(opt_callback) {
     });
 };
 
-Jira.prototype.expandEmojiToHtml_ = function(content) {
+Jira.prototype.expandEmoji_ = function(content) {
     return content.replace(':octocat:', '![NodeGH](http://nodegh.io/images/octocat.png)');
 };
 
