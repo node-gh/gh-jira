@@ -316,4 +316,18 @@ Jira.prototype.registerLoggerHelpers_ = function() {
     });
 };
 
+Jira.prototype.findFirstArrayValue_ = function(values, key, search) {
+    var value;
+
+    values.every(function(val) {
+        if (val[key] === search) {
+            value = val;
+            return false;
+        }
+        return true;
+    });
+
+    return value;
+};
+
 exports.Impl = Jira;
