@@ -41,6 +41,10 @@
         "lint": "node_modules/.bin/jshint bin/ test/",
         "test": "node_modules/.bin/mocha --reporter list"
     },
+    "dependencies": {
+        "async": "0.2.7",
+        "jira": "0.6.0"
+    },
     "devDependencies": {
         "jshint": "2.1.2",
         "mocha": "1.12.0"
