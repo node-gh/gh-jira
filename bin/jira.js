@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /*
  * Copyright 2013, All Rights Reserved.
  *
@@ -7,6 +9,7 @@
  * @author Author <email@email.com>
  */
 
+// -- Environment --------------------------------------------------------------
 var GH_PATH = process.env.GH_PATH;
 
 // -- Requires -----------------------------------------------------------------
@@ -41,12 +44,12 @@ Boilerplate.prototype.run = function() {
         options = instance.options;
 
     if (options.foo) {
-        instance.foo();
+        logger.log(instance.foo());
     }
 };
 
 Boilerplate.prototype.foo = function() {
-    logger.log('NodeGH plugin boilerplate :)');
+    return 'NodeGH plugin boilerplate :)';
 };
 
 exports.Impl = Boilerplate;
