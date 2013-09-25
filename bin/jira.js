@@ -224,6 +224,15 @@ Jira.prototype.getPriorityByName_ = function(name, opt_callback) {
         opt_callback && opt_callback(err, priority);
     });
 };
+
+Jira.prototype.getProject_ = function(name, opt_callback) {
+    var instance = this;
+
+    instance.api.getProject(name, function(err, project) {
+        opt_callback && opt_callback(err, project);
+    });
+};
+
 Jira.prototype.new = function(opt_callback) {
     var instance = this,
         options = instance.options,
