@@ -90,6 +90,24 @@ Jira.prototype.run = function() {
                 }));
         });
     }
+
+    if (options.new) {
+        logger.logTemplate(
+            '{{prefix}} [info] Creating a new issue on project {{greenBright options.project}}', {
+                options: options
+            });
+
+        instance.new(function(err, issue) {
+            if (issue) {
+                options.number = issue.key;
+            }
+
+            logger.defaultCallback(
+                err, null, logger.compileTemplate('{{jiraIssueLink}}', {
+                    options: options
+                }));
+        });
+    }
 };
 
 Jira.prototype.comment = function(opt_callback) {
@@ -135,6 +153,148 @@ Jira.prototype.getIssue_ = function(issueNumber, opt_callback) {
     var instance = this;
 
     instance.api.findIssue(issueNumber, function(err, issue) {
+        opt_callback && opt_callback(err, issue);
+    });
+};
+
+Jira.prototype.new = function(opt_callback) {
+    var instance = this,
+        options = instance.options,
+        config = base.getGlobalConfig(),
+        component,
+        issue,
+        issueType,
+        operations,
+        payload,
+        priority,
+        project,
+        version;
+
+    if (options.message) {
+        options.message = logger.applyReplacements(options.message);
+    }
+
+    options.assignee = options.assignee || config.jira.user;
+    options.reporter = options.reporter || config.jira.user;
+    options.message = options.message || '';
+    options.title = options.title || '';
+
+    operations = [
+        function(callback) {
+            instance.getIssueTypeByName_(options.type, function(err, data) {
+                if (!err) {
+                    issueType = data;
+                }
+                if (!issueType) {
+                    err = 'No issue found, try --type "Bug".';
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            instance.getProject_(options.project, function(err, data) {
+                if (!err) {
+                    project = data;
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            instance.getProjectComponentByName_(options.project, options.component, function(err, data) {
+                if (!err) {
+                    component = data;
+                }
+                if (!component) {
+                    err = 'No component found, try --component "JavaScript".';
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            // Since priority is not required in many JIRA configurations, skip
+            // it if not specified.
+            if (!options.priority) {
+                callback();
+                return;
+            }
+
+            instance.getPriorityByName_(options.priority, function(err, data) {
+                if (!err) {
+                    priority = data;
+                }
+                if (!priority) {
+                    err = 'No priority found, try --priority "JavaScript".';
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            // Since version is not required in many JIRA configurations, skip
+            // it if not specified.
+            if (!options.version) {
+                callback();
+                return;
+            }
+
+            instance.getVersionByName_(options.project, options.version, function(err, data) {
+                if (!err) {
+                    version = data;
+                }
+                if (!version) {
+                    err = 'No version found, try --version "0.1.0".';
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            payload = {
+                fields: {
+                    assignee: {
+                        name: options.assignee
+                    },
+                    components: [
+                        {
+                            id: component.id
+                        }
+                    ],
+                    description: options.message,
+                    issuetype: {
+                        id: issueType.id
+                    },
+                    project: {
+                        id: project.id
+                    },
+                    reporter: {
+                        name: options.reporter
+                    },
+                    summary: options.title
+                }
+            };
+
+            if (priority) {
+                payload.fields.priority = {
+                    id: priority.id
+                };
+            }
+
+            if (version) {
+                payload.fields.versions = [
+                    {
+                        id: version.id
+                    }
+                ];
+            }
+
+            instance.api.addNewIssue(payload, function(err, data) {
+                if (!err) {
+                    issue = data;
+                }
+                callback(err);
+            });
+        }
+    ];
+
+    async.series(operations, function(err) {
         opt_callback && opt_callback(err, issue);
     });
 };
