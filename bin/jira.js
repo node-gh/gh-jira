@@ -304,7 +304,6 @@ Jira.prototype.getVersions_ = function(project, opt_callback) {
 Jira.prototype.new = function(opt_callback) {
     var instance = this,
         options = instance.options,
-        config = base.getGlobalConfig(),
         component,
         issue,
         issueType,
@@ -318,8 +317,6 @@ Jira.prototype.new = function(opt_callback) {
         options.message = logger.applyReplacements(options.message);
     }
 
-    options.assignee = options.assignee || config.jira.user;
-    options.reporter = options.reporter || config.jira.user;
     options.message = options.message || '';
     options.title = options.title || '';
 
