@@ -190,6 +190,40 @@ Jira.prototype.getIssueTypes_ = function(opt_callback) {
         opt_callback && opt_callback(err, types);
     });
 };
+
+Jira.prototype.getPriorities_ = function(opt_callback) {
+    var instance = this;
+
+    instance.api.listPriorities(function(err, components) {
+        opt_callback && opt_callback(err, components);
+    });
+};
+
+Jira.prototype.getPriorityByName_ = function(name, opt_callback) {
+    var instance = this,
+        operations,
+        priorities,
+        priority;
+
+    operations = [
+        function(callback) {
+            instance.getPriorities_(function(err, data) {
+                if (!err) {
+                    priorities = data;
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            priority = instance.findFirstArrayValue_(priorities, 'name', name);
+            callback();
+        }
+    ];
+
+    async.series(operations, function(err) {
+        opt_callback && opt_callback(err, priority);
+    });
+};
 Jira.prototype.new = function(opt_callback) {
     var instance = this,
         options = instance.options,
