@@ -30,7 +30,8 @@ Jira.DETAILS = {
     iterative: 'number',
     commands: [
         'comment',
-        'new'
+        'new',
+        'transition'
     ],
     description: 'NodeGH plugin for integrating Jira, an issue management system.',
     options: {
@@ -43,7 +44,9 @@ Jira.DETAILS = {
         'priority': String,
         'project': String,
         'reporter': String,
+        'resolution': String,
         'title': String,
+        'transition': String,
         'type': String,
         'version': String
     },
@@ -113,6 +116,25 @@ Jira.prototype.run = function() {
                     options: options
                 }));
         });
+    }
+
+    if (options.transition) {
+        logger.logTemplate(
+            '{{prefix}} [info] Updating issue {{greenBright options.number}} to {{magentaBright options.transition}}', {
+                options: options
+            });
+
+        if (options.transition === 'true') {
+            instance.transitionWithQuestion(options.number, options.transition);
+        }
+        else {
+            instance.transition(options.number, options.transition, function(err) {
+                logger.defaultCallback(
+                    err, null, logger.compileTemplate('{{jiraIssueLink}}', {
+                        options: options
+                    }));
+            });
+        }
     }
 };
 
@@ -463,6 +485,84 @@ Jira.prototype.registerLoggerHelpers_ = function() {
     });
 };
 
+Jira.prototype.transition = function(number, name, opt_callback) {
+    var instance = this,
+        options = instance.options,
+        issue,
+        newIssue,
+        operations,
+        payload,
+        transition;
+
+    options.message = options.message || '';
+
+    operations = [
+        function(callback) {
+            instance.getTransitionByName_(number, name, function(err, data) {
+                if (!err) {
+                    transition = data;
+                }
+                if (!transition) {
+                    err = '"' + name + '" is not a valid transition, try another action.';
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            instance.getIssue_(number, function(err, data) {
+                if (!err) {
+                    issue = data;
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            payload = {
+                update: {},
+                fields: {},
+                transition: {
+                    id: transition.id
+                }
+            };
+
+            if (options.originalAssignee) {
+                payload.fields.assignee = {
+                    name: options.assignee
+                };
+            }
+
+            if (options.message) {
+                options.message = instance.expandComment_(
+                    logger.applyReplacements(options.message));
+
+                payload.update.comment = [
+                    {
+                        add: {
+                            body: options.message
+                        }
+                    }
+                ];
+            }
+
+            if (options.resolution) {
+                payload.fields.resolution = {
+                    name: options.resolution
+                };
+            }
+
+            instance.api.transitionIssue(issue.id, payload, function(err, data) {
+                if (!err) {
+                    newIssue = data;
+                }
+                callback(err);
+            });
+        }
+    ];
+
+    async.series(operations, function(err) {
+        opt_callback && opt_callback(err, newIssue);
+    });
+};
 Jira.prototype.findFirstArrayValue_ = function(values, key, search) {
     var value;
 
