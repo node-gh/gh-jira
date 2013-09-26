@@ -15,6 +15,7 @@ var GH_PATH = process.env.GH_PATH;
 var async = require('async'),
     jira = require('jira'),
     url = require('url'),
+    prompt = require('prompt'),
     base = require(GH_PATH + 'lib/base'),
     logger = require(GH_PATH + 'lib/logger');
 
@@ -120,15 +121,25 @@ Jira.prototype.run = function() {
     }
 
     if (options.transition) {
-        logger.logTemplate(
-            '{{prefix}} [info] Updating issue {{greenBright options.number}} to {{magentaBright options.transition}}', {
-                options: options
-            });
-
         if (options.transition === 'true') {
-            instance.transitionWithQuestion(options.number, options.transition);
+            logger.logTemplate(
+                '{{prefix}} [info] Listing available transitions to {{greenBright options.number}}', {
+                    options: options
+                });
+
+            instance.transitionWithQuestion_(options.number, options.transition, function(err) {
+                logger.defaultCallback(
+                    err, null, logger.compileTemplate('{{jiraIssueLink}}', {
+                        options: options
+                    }));
+            });
         }
         else {
+            logger.logTemplate(
+                '{{prefix}} [info] Updating issue {{greenBright options.number}} to {{magentaBright options.transition}}', {
+                    options: options
+                });
+
             instance.transition(options.number, options.transition, function(err) {
                 logger.defaultCallback(
                     err, null, logger.compileTemplate('{{jiraIssueLink}}', {
@@ -598,6 +609,68 @@ Jira.prototype.transition = function(number, name, opt_callback) {
         opt_callback && opt_callback(err, newIssue);
     });
 };
+
+Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
+    var instance = this,
+        options = instance.options,
+        transitionIndex,
+        transition,
+        transitionName,
+        transitions,
+        operations;
+
+    operations = [
+        function(callback) {
+            instance.api.listTransitions(number, function(err, data) {
+                if (!err) {
+                    transitions = data;
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            logger.logTemplateFile(__dirname + '/transitions.handlebars', {
+                options: options,
+                transitions: transitions
+            });
+
+            prompt.get([
+                    {
+                        name: 'transitionIndex',
+                        message: 'Type the number of the transition [0 - ' + (transitions.length - 1) + ']',
+                        empty: false
+                    }
+                ],
+                function(err, result) {
+                    if (!err) {
+                        transitionIndex = result.transitionIndex;
+                    }
+                    callback(err);
+                });
+        },
+        function(callback) {
+            transitionName = transitions[transitionIndex].name;
+
+            logger.logTemplate(
+                '{{prefix}} [info] Updating issue {{greenBright options.number}} to {{magentaBright transitionName}}', {
+                    options: options,
+                    transitionName: transitionName
+                });
+
+            instance.transition(number, transitionName, function(err, data) {
+                if (!err) {
+                    transition = data;
+                }
+                callback(err);
+            });
+        }
+    ];
+
+    async.series(operations, function(err) {
+        opt_callback && opt_callback(err, transition);
+    });
+};
+
 Jira.prototype.findFirstArrayValue_ = function(values, key, search) {
     var value;
 
