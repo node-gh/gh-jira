@@ -295,6 +295,40 @@ Jira.prototype.getProjectComponents_ = function(project, opt_callback) {
     });
 };
 
+Jira.prototype.getTransitions_ = function(number, opt_callback) {
+    var instance = this;
+
+    instance.api.listTransitions(number, function(err, transitions) {
+        opt_callback && opt_callback(err, transitions);
+    });
+};
+
+Jira.prototype.getTransitionByName_ = function(number, name, opt_callback) {
+    var instance = this,
+        operations,
+        transition,
+        transitions;
+
+    operations = [
+        function(callback) {
+            instance.getTransitions_(number, function(err, data) {
+                if (!err) {
+                    transitions = data;
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            transition = instance.findFirstArrayValue_(transitions, 'name', name);
+            callback();
+        }
+    ];
+
+    async.series(operations, function(err) {
+        opt_callback && opt_callback(err, transition);
+    });
+};
+
 Jira.prototype.getVersionByName_ = function(project, name, opt_callback) {
     var instance = this,
         operations,
