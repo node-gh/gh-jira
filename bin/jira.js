@@ -179,6 +179,26 @@ Jira.prototype.comment = function(opt_callback) {
     });
 };
 
+Jira.prototype.compileObjectValuesTemplate_ = function(o) {
+    var instance = this,
+        options = instance.options,
+        config = base.getGlobalConfig();
+
+    Object.keys(o).forEach(function(key) {
+        var value = o[key];
+
+        if (typeof value === 'object') {
+            instance.compileObjectValuesTemplate_(value);
+        }
+        else {
+            o[key] = logger.compileTemplate(value, {
+                jira: config.jira,
+                options: options
+            });
+        }
+    });
+};
+
 Jira.prototype.expandComment_ = function(comment) {
     var instance = this,
         config = base.getGlobalConfig();
@@ -188,6 +208,58 @@ Jira.prototype.expandComment_ = function(comment) {
 
 Jira.prototype.expandEmoji_ = function(content) {
     return content.replace(':octocat:', '![NodeGH](http://nodegh.io/images/octocat.png)');
+};
+
+Jira.prototype.expandTransitionPayloadFromConfig_ = function(transitionName, payload, opt_callback) {
+    var instance = this,
+        config = base.getGlobalConfig(),
+        transition = config.jira.transition[transitionName],
+        field,
+        fields,
+        operations;
+
+    if (transition) {
+        operations = [
+            function(callback) {
+                instance.getFields_(function(err, data) {
+                    if (!err) {
+                        fields = data;
+                    }
+                    callback(err);
+                });
+            },
+            function(callback) {
+                Object.keys(transition).forEach(function(fieldName) {
+                    var fieldValue = transition[fieldName];
+
+                    if (fieldValue) {
+                        // Get field by name using fields cache to avoid
+                        // unecesary server roundtrip.
+                        instance.getFieldByName_(fieldName, function(err, data) {
+                            if (!err) {
+                                field = data;
+                            }
+                        }, fields);
+
+                        if (field) {
+                            payload.fields[field.id] = fieldValue;
+                        }
+                    }
+                });
+
+                instance.compileObjectValuesTemplate_(payload);
+
+                callback();
+            }
+        ];
+
+        async.series(operations, function(err) {
+            opt_callback && opt_callback(err, payload);
+        });
+    }
+    else {
+        opt_callback && opt_callback(null, payload);
+    }
 };
 
 Jira.prototype.findFirstArrayValue_ = function(values, key, search) {
@@ -202,6 +274,47 @@ Jira.prototype.findFirstArrayValue_ = function(values, key, search) {
     });
 
     return value;
+};
+
+Jira.prototype.getFields_ = function(opt_callback) {
+    var instance = this;
+
+    instance.api.listFields(function(err, components) {
+        opt_callback && opt_callback(err, components);
+    });
+};
+
+Jira.prototype.getFieldByName_ = function(name, opt_callback, opt_source) {
+    var instance = this,
+        operations,
+        fields,
+        field;
+
+    operations = [
+        function(callback) {
+            // If opt_source is specified use it instead of invoke jira API.
+            if (opt_source) {
+                fields = opt_source;
+                callback();
+                return;
+            }
+
+            instance.getFields_(function(err, data) {
+                if (!err) {
+                    fields = data;
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            field = instance.findFirstArrayValue_(fields, 'name', name);
+            callback();
+        }
+    ];
+
+    async.series(operations, function(err) {
+        opt_callback && opt_callback(err, field);
+    });
 };
 
 Jira.prototype.getIssue_ = function(issueNumber, opt_callback) {
@@ -553,6 +666,7 @@ Jira.prototype.transition = function(number, name, opt_callback) {
         newIssue,
         operations,
         payload,
+        expandedPayload,
         transition;
 
     options.message = options.message || '';
@@ -586,6 +700,14 @@ Jira.prototype.transition = function(number, name, opt_callback) {
                 }
             };
 
+            instance.expandTransitionPayloadFromConfig_(name, payload, function(err, data) {
+                if (!err) {
+                    expandedPayload = data;
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
             if (options.originalAssignee) {
                 payload.fields.assignee = {
                     name: options.assignee
@@ -611,7 +733,10 @@ Jira.prototype.transition = function(number, name, opt_callback) {
                 };
             }
 
-            instance.api.transitionIssue(issue.id, payload, function(err, data) {
+            callback();
+        },
+        function(callback) {
+            instance.api.transitionIssue(issue.id, expandedPayload, function(err, data) {
                 if (!err) {
                     newIssue = data;
                 }
