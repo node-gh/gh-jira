@@ -869,7 +869,6 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
 Jira.prototype.update = function(number, opt_callback) {
     var instance = this,
         issue,
-        updatedIssue,
         operations,
         payload;
 
@@ -884,18 +883,12 @@ Jira.prototype.update = function(number, opt_callback) {
         },
         function(callback) {
             instance.deleteObjectEmptyValues_(payload);
-
-            instance.getIssue_(number, function(err, data) {
-                if (!err) {
-                    issue = data;
-                }
-                callback(err);
-            });
+            callback();
         },
         function(callback) {
             instance.api.updateIssue(number, payload, function(err, data) {
                 if (!err) {
-                    updatedIssue = data;
+                    issue = data;
                 }
                 callback(err);
             });
@@ -903,7 +896,7 @@ Jira.prototype.update = function(number, opt_callback) {
     ];
 
     async.series(operations, function(err) {
-        opt_callback && opt_callback(err, updatedIssue);
+        opt_callback && opt_callback(err, issue);
     });
 };
 
