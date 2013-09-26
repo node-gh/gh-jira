@@ -49,6 +49,7 @@ Jira.DETAILS = {
         'title': String,
         'transition': String,
         'type': String,
+        'update': Boolean,
         'version': String
     },
     shorthands: {
@@ -63,6 +64,7 @@ Jira.DETAILS = {
         'R': ['--reporter'],
         'T': ['--type'],
         't': ['--title'],
+        'u': ['--update'],
         'v': ['--version']
     }
 };
@@ -149,6 +151,20 @@ Jira.prototype.run = function() {
             });
         }
     }
+
+    if (options.update) {
+        logger.logTemplate(
+            '{{prefix}} [info] Updating issue {{greenBright options.number}}', {
+                options: options
+            });
+
+        instance.update(options.number, function(err) {
+            logger.defaultCallback(
+                err, null, logger.compileTemplate('{{jiraIssueLink}}', {
+                    options: options
+                }));
+        });
+    }
 };
 
 Jira.prototype.comment = function(opt_callback) {
@@ -195,6 +211,21 @@ Jira.prototype.compileObjectValuesTemplate_ = function(o) {
                 jira: config.jira,
                 options: options
             });
+        }
+    });
+};
+
+Jira.prototype.deleteObjectEmptyValues_ = function(o) {
+    var instance = this;
+
+    Object.keys(o).forEach(function(key) {
+        var value = o[key];
+
+        if (typeof value === 'object') {
+            instance.deleteObjectEmptyValues_(value);
+        }
+        else if (value === undefined || value === '') {
+            delete o[key];
         }
     });
 };
@@ -832,6 +863,47 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
 
     async.series(operations, function(err) {
         opt_callback && opt_callback(err, transition);
+    });
+};
+
+Jira.prototype.update = function(number, opt_callback) {
+    var instance = this,
+        issue,
+        updatedIssue,
+        operations,
+        payload;
+
+    operations = [
+        function(callback) {
+            instance.getUpdatePayload_(function(err, data) {
+                if (!err) {
+                    payload = data;
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            instance.deleteObjectEmptyValues_(payload);
+
+            instance.getIssue_(number, function(err, data) {
+                if (!err) {
+                    issue = data;
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            instance.api.updateIssue(number, payload, function(err, data) {
+                if (!err) {
+                    updatedIssue = data;
+                }
+                callback(err);
+            });
+        }
+    ];
+
+    async.series(operations, function(err) {
+        opt_callback && opt_callback(err, updatedIssue);
     });
 };
 
