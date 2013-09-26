@@ -9,7 +9,7 @@
             "LPS": "6.2.X"
         },
         "default_project": "",
-        "host": "",
+        "host": "issues.liferay.com",
         "password": "",
         "port": "",
         "protocol": "https",
