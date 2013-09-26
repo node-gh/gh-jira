@@ -9,7 +9,7 @@
 
 // -- Requires -----------------------------------------------------------------
 var assert = require('assert'),
-    boilerplate = require('../bin/boilerplate');
+    boilerplate = require('../bin/jira.js');
 
 // -- Suites -------------------------------------------------------------------
 describe('A test suite', function() {
