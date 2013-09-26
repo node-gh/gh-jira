@@ -13,6 +13,13 @@
         "password": "",
         "port": "",
         "protocol": "https",
-        "user": ""
+        "user": "",
+        "transition": {
+            "Start Progress": {
+                "Assignee": {
+                    "name": "{{jira.user}}"
+                }
+            }
+        }
     }
 }
