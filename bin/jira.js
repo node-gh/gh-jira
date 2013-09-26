@@ -123,7 +123,7 @@ Jira.prototype.run = function() {
     if (options.transition) {
         if (options.transition === 'true') {
             logger.logTemplate(
-                '{{prefix}} [info] Listing available transitions to {{greenBright options.number}}', {
+                '{{prefix}} [info] Listing available transitions for {{greenBright options.number}}', {
                     options: options
                 });
 
