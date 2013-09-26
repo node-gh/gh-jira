@@ -1,10 +1,12 @@
 {
     "jira": {
         "api_version": "2",
-        "default_issue_component": "",
+        "default_issue_component": {
+            "LPS": "UI"
+        },
         "default_issue_type": "Bug",
         "default_issue_version": {
-            "JIR": "5.0.0"
+            "LPS": "6.2.X"
         },
         "default_project": "",
         "host": "",
