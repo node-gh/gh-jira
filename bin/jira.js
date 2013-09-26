@@ -189,6 +189,20 @@ Jira.prototype.expandEmoji_ = function(content) {
     return content.replace(':octocat:', '![NodeGH](http://nodegh.io/images/octocat.png)');
 };
 
+Jira.prototype.findFirstArrayValue_ = function(values, key, search) {
+    var value;
+
+    values.every(function(val) {
+        if (val[key] === search) {
+            value = val;
+            return false;
+        }
+        return true;
+    });
+
+    return value;
+};
+
 Jira.prototype.getIssue_ = function(issueNumber, opt_callback) {
     var instance = this;
 
@@ -669,20 +683,6 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
     async.series(operations, function(err) {
         opt_callback && opt_callback(err, transition);
     });
-};
-
-Jira.prototype.findFirstArrayValue_ = function(values, key, search) {
-    var value;
-
-    values.every(function(val) {
-        if (val[key] === search) {
-            value = val;
-            return false;
-        }
-        return true;
-    });
-
-    return value;
 };
 
 exports.Impl = Jira;
