@@ -86,6 +86,7 @@ Jira.prototype.run = function() {
     options.project = options.project || config.jira.default_project;
     options.reporter = options.reporter || config.jira.user;
     options.type = options.type || config.jira.default_issue_type;
+    options.component = options.component || config.jira.default_issue_component[options.project];
     options.version = options.version || config.jira.default_issue_version[options.project];
 
     if (options.comment) {
