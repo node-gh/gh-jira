@@ -80,6 +80,7 @@ Jira.prototype.run = function() {
 
     instance.registerLoggerHelpers_();
 
+    options.originalAssignee = options.assignee;
     options.assignee = options.assignee || config.jira.user;
     options.project = options.project || config.jira.default_project;
     options.reporter = options.reporter || config.jira.user;
