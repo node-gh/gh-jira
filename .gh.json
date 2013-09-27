@@ -7,7 +7,7 @@
     "default_issue_version": {
         "LPS": "6.2.X"
     },
-    "default_project": "",
+    "default_project": "LPS",
     "host": "issues.liferay.com",
     "password": "",
     "port": "",
