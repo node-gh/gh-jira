@@ -97,7 +97,17 @@ Jira.prototype.run = function() {
     options.version = options.version || config.jira.default_issue_version[options.project];
 
     if (options.browser) {
-        instance.browser(options.number);
+        if (options.number) {
+            instance.browser(options.number);
+        }
+        else {
+            instance.getIssueNumberFromCommitMessage_(function(err, data) {
+                if (!data) {
+                    logger.defaultCallback('Could not find issue number, try with --number.');
+                }
+                instance.browser(data);
+            });
+        }
     }
 
     if (options.comment) {
