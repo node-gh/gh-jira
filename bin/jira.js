@@ -512,7 +512,7 @@ Jira.prototype.getUpdatePayload_ = function(opt_callback) {
                     priority = data;
                 }
                 if (!priority) {
-                    err = 'No priority found, try --priority "JavaScript".';
+                    err = 'No priority found, try --priority "Minor".';
                 }
                 callback(err);
             });
