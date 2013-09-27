@@ -79,7 +79,7 @@ Jira.prototype.api = null;
 
 Jira.prototype.run = function() {
     var instance = this,
-        config = base.getGlobalConfig(),
+        config = base.getPluginConfig().plugins,
         options = instance.options;
 
     instance.api = new jira.JiraApi(
@@ -223,7 +223,7 @@ Jira.prototype.comment = function(opt_callback) {
 Jira.prototype.compileObjectValuesTemplate_ = function(o) {
     var instance = this,
         options = instance.options,
-        config = base.getGlobalConfig();
+        config = base.getPluginConfig().plugin;
 
     Object.keys(o).forEach(function(key) {
         var value = o[key];
@@ -257,7 +257,7 @@ Jira.prototype.deleteObjectEmptyValues_ = function(o) {
 
 Jira.prototype.expandComment_ = function(comment) {
     var instance = this,
-        config = base.getGlobalConfig();
+        config = base.getPluginConfig();
 
     return '{markdown}' + comment + instance.expandEmoji_(config.signature) + '{markdown}';
 };
@@ -268,7 +268,7 @@ Jira.prototype.expandEmoji_ = function(content) {
 
 Jira.prototype.expandTransitionPayloadFromConfig_ = function(transitionName, payload, opt_callback) {
     var instance = this,
-        config = base.getGlobalConfig(),
+        config = base.getPluginConfig().plugins,
         transition = config.jira.transition[transitionName],
         field,
         fields,
@@ -333,7 +333,7 @@ Jira.prototype.findFirstArrayValue_ = function(values, key, search) {
 };
 
 Jira.prototype.getIssueNumberBestMatch_ = function(text) {
-    var config = base.getGlobalConfig(),
+    var config = base.getPluginConfig().plugins,
         project = config.jira.default_project,
         match,
         numberRegex;
@@ -440,7 +440,7 @@ Jira.prototype.getIssueTypes_ = function(opt_callback) {
 };
 
 Jira.prototype.getIssueUrl_ = function(number) {
-    var config = base.getGlobalConfig();
+    var config = base.getPluginConfig().plugins;
 
     return url.format({
         protocol: config.jira.protocol,
