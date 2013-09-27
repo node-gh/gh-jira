@@ -772,16 +772,15 @@ Jira.prototype.searchUser_ = function(query, opt_callback) {
     instance.api.searchUsers(query, 0, 1, true, false, opt_callback);
 };
 
-Jira.prototype.searchUserByGithubUsername_ = function(opt_callback) {
+Jira.prototype.searchUserByGithubUsername_ = function(query, opt_callback) {
     var instance = this,
-        config = base.getPluginConfig(),
         operations,
-        gitUsername,
-        user;
+        user,
+        userGithub;
 
     operations = [
         function(callback) {
-            instance.searchUser_(config.user, function(err, data) {
+            instance.searchUser_(query, function(err, data) {
                 if (!err && data.length) {
                     user = data[0];
                 }
@@ -789,20 +788,25 @@ Jira.prototype.searchUserByGithubUsername_ = function(opt_callback) {
             });
         },
         function(callback) {
-            git.getConfig('user.name', function(err, data) {
-                if (!err) {
-                    gitUsername = data;
-                }
-                callback(err);
-            });
-        },
-        function(callback) {
+            // If user was found on jira do not call github search.
             if (user) {
                 callback();
                 return;
             }
 
-            instance.searchUser_(gitUsername, function(err, data) {
+            var payload = {
+                keyword: query
+            };
+
+            base.github.search.users(payload, function(err, data) {
+                if (!err) {
+                    userGithub = data.users[0];
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            instance.searchUser_(userGithub.name, function(err, data) {
                 if (!err && data.length) {
                     user = data[0];
                 }
