@@ -766,6 +766,56 @@ Jira.prototype.registerLoggerHelpers_ = function() {
     });
 };
 
+Jira.prototype.searchUser_ = function(query, opt_callback) {
+    var instance = this;
+
+    instance.api.searchUsers(query, 0, 1, true, false, opt_callback);
+};
+
+Jira.prototype.searchUserByGithubUsername_ = function(opt_callback) {
+    var instance = this,
+        config = base.getPluginConfig(),
+        operations,
+        gitUsername,
+        user;
+
+    operations = [
+        function(callback) {
+            instance.searchUser_(config.user, function(err, data) {
+                if (!err && data.length) {
+                    user = data[0];
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            git.getConfig('user.name', function(err, data) {
+                if (!err) {
+                    gitUsername = data;
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            if (user) {
+                callback();
+                return;
+            }
+
+            instance.searchUser_(gitUsername, function(err, data) {
+                if (!err && data.length) {
+                    user = data[0];
+                }
+                callback(err);
+            });
+        }
+    ];
+
+    async.series(operations, function(err) {
+        opt_callback && opt_callback(err, user);
+    });
+};
+
 Jira.prototype.transition = function(number, name, opt_callback) {
     var instance = this,
         options = instance.options,
