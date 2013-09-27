@@ -16,6 +16,7 @@ var async = require('async'),
     jira = require('jira'),
     url = require('url'),
     prompt = require('prompt'),
+    openUrl = require('open'),
     base = require(GH_PATH + 'lib/base'),
     logger = require(GH_PATH + 'lib/logger');
 
@@ -30,6 +31,7 @@ Jira.DETAILS = {
     alias: 'ji',
     iterative: 'number',
     commands: [
+        'browser',
         'comment',
         'new',
         'transition'
@@ -37,6 +39,7 @@ Jira.DETAILS = {
     description: 'NodeGH plugin for integrating Jira, an issue management system.',
     options: {
         'assignee': String,
+        'browser': Boolean,
         'comment': String,
         'component': String,
         'message': String,
@@ -54,6 +57,7 @@ Jira.DETAILS = {
     },
     shorthands: {
         'A': ['--assignee'],
+        'B': ['--browser'],
         'c': ['--comment'],
         'C': ['--component'],
         'm': ['--message'],
@@ -90,6 +94,10 @@ Jira.prototype.run = function() {
     options.type = options.type || config.jira.default_issue_type;
     options.component = options.component || config.jira.default_issue_component[options.project];
     options.version = options.version || config.jira.default_issue_version[options.project];
+
+    if (options.browser) {
+        instance.browser(options.number);
+    }
 
     if (options.comment) {
         logger.logTemplate(
@@ -165,6 +173,12 @@ Jira.prototype.run = function() {
                 }));
         });
     }
+};
+
+Jira.prototype.browser = function(number) {
+    var instance = this;
+
+    openUrl(instance.getIssueUrl_(number));
 };
 
 Jira.prototype.comment = function(opt_callback) {
@@ -387,6 +401,17 @@ Jira.prototype.getIssueTypes_ = function(opt_callback) {
 
     instance.api.listIssueTypes(function(err, types) {
         opt_callback && opt_callback(err, types);
+    });
+};
+
+Jira.prototype.getIssueUrl_ = function(number) {
+    var config = base.getGlobalConfig();
+
+    return url.format({
+        protocol: config.jira.protocol,
+        hostname: config.jira.host,
+        port: config.jira.port,
+        pathname: '/browse/' + number
     });
 };
 
@@ -699,18 +724,10 @@ Jira.prototype.new = function(opt_callback) {
 
 Jira.prototype.registerLoggerHelpers_ = function() {
     var instance = this,
-        options = instance.options,
-        config = base.getGlobalConfig();
+        options = instance.options;
 
     logger.registerHelper('jiraIssueLink', function() {
-        var link = url.format({
-            protocol: config.jira.protocol,
-            hostname: config.jira.host,
-            port: config.jira.port,
-            pathname: '/browse/' + options.number
-        });
-
-        return link;
+        return instance.getIssueUrl_(options.number);
     });
 };
 
