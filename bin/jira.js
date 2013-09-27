@@ -177,30 +177,9 @@ Jira.prototype.run = function() {
 };
 
 Jira.prototype.browser = function(number) {
-    var instance = this,
-        operations;
+    var instance = this;
 
-    operations = [
-        function(callback) {
-            if (number) {
-                callback();
-                return;
-            }
-
-            instance.getIssueNumberFromCommitMessage_(function(err, data) {
-                if (!err) {
-                    number = data;
-                }
-                callback(err);
-            });
-        }
-    ];
-
-    async.series(operations, function(err) {
-        if (!err) {
-            openUrl(instance.getIssueUrl_(number));
-        }
-    });
+    openUrl(instance.getIssueUrl_(number));
 };
 
 Jira.prototype.comment = function(opt_callback) {
