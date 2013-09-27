@@ -18,6 +18,7 @@ var async = require('async'),
     prompt = require('prompt'),
     openUrl = require('open'),
     base = require(GH_PATH + 'lib/base'),
+    git = require(GH_PATH + 'lib/git'),
     logger = require(GH_PATH + 'lib/logger');
 
 // -- Constructor --------------------------------------------------------------
@@ -176,9 +177,30 @@ Jira.prototype.run = function() {
 };
 
 Jira.prototype.browser = function(number) {
-    var instance = this;
+    var instance = this,
+        operations;
 
-    openUrl(instance.getIssueUrl_(number));
+    operations = [
+        function(callback) {
+            if (number) {
+                callback();
+                return;
+            }
+
+            instance.getIssueNumberFromCommitMessage_(function(err, data) {
+                if (!err) {
+                    number = data;
+                }
+                callback(err);
+            });
+        }
+    ];
+
+    async.series(operations, function(err) {
+        if (!err) {
+            openUrl(instance.getIssueUrl_(number));
+        }
+    });
 };
 
 Jira.prototype.comment = function(opt_callback) {
@@ -319,6 +341,30 @@ Jira.prototype.findFirstArrayValue_ = function(values, key, search) {
     });
 
     return value;
+};
+
+Jira.prototype.getIssueNumberBestMatch_ = function(text) {
+    var config = base.getGlobalConfig(),
+        project = config.jira.default_project,
+        match,
+        numberRegex;
+
+    if (project) {
+        numberRegex = new RegExp(project + '-[0-9]+');
+
+        if (match = text.match(numberRegex)) {
+            return match[0];
+        }
+    }
+};
+
+Jira.prototype.getIssueNumberFromCommitMessage_ = function(opt_callback) {
+    var instance = this;
+
+    git.getLastCommitMessage(null, function(err, data) {
+        data = instance.getIssueNumberBestMatch_(data);
+        opt_callback && opt_callback(err, data);
+    });
 };
 
 Jira.prototype.getFields_ = function(opt_callback) {
