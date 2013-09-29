@@ -71,6 +71,9 @@ Jira.DETAILS = {
         't': ['--title'],
         'u': ['--update'],
         'v': ['--version']
+    },
+    payload: function(payload, options) {
+        options.transition = true;
     }
 };
 
