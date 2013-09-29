@@ -13,9 +13,9 @@ var GH_PATH = process.env.GH_PATH;
 
 // -- Requires -----------------------------------------------------------------
 var async = require('async'),
+    inquirer = require('inquirer'),
     jira = require('jira'),
     url = require('url'),
-    prompt = require('prompt'),
     openUrl = require('open'),
     base = require(GH_PATH + 'lib/base'),
     git = require(GH_PATH + 'lib/git'),
@@ -914,9 +914,9 @@ Jira.prototype.transition = function(number, name, opt_callback) {
 Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
     var instance = this,
         options = instance.options,
-        transitionIndex,
+        action,
+        choices,
         transition,
-        transitionName,
         transitions,
         operations;
 
@@ -930,35 +930,36 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
             });
         },
         function(callback) {
-            logger.logTemplateFile(__dirname + '/transitions.handlebars', {
-                options: options,
-                transitions: transitions
+            choices = [];
+            transitions.forEach(function(val) {
+                choices.push(val.name);
             });
+            choices.push(new inquirer.Separator());
+            choices.push('Nothing, thanks.');
 
-            prompt.get([
+            inquirer.prompt(
+                [
                     {
-                        name: 'transitionIndex',
-                        message: 'Type the number of the transition [0 - ' + (transitions.length - 1) + ']',
-                        empty: false
+                        choices: choices,
+                        message: 'What do you want to do with ' + logger.clc.greenBright(options.number) + '?',
+                        name: 'transition',
+                        type: 'list'
                     }
-                ],
-                function(err, result) {
-                    if (!err) {
-                        transitionIndex = result.transitionIndex;
-                    }
-                    callback(err);
+                ], function(answers) {
+                    action = instance.findFirstArrayValue_(transitions, 'name', answers.transition);
+                    callback();
                 });
         },
         function(callback) {
-            transitionName = transitions[transitionIndex].name;
+            // If no action was selected don't transition the jira issue.
+            if (!action) {
+                callback();
+                return;
+            }
 
-            logger.logTemplate(
-                '{{prefix}} [info] Updating issue {{greenBright options.number}} to {{magentaBright transitionName}}', {
-                    options: options,
-                    transitionName: transitionName
-                });
+            logger.logTemplate('{{prefix}} [info] Updating issue');
 
-            instance.transition(number, transitionName, function(err, data) {
+            instance.transition(number, action.name, function(err, data) {
                 if (!err) {
                     transition = data;
                 }
