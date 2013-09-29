@@ -77,6 +77,10 @@ Jira.DETAILS = {
     }
 };
 
+Jira.ACTION_ISSUE_ASSIGN_TO_ME = 'ISSUE_ASSIGN_TO_ME';
+
+Jira.ACTION_ISSUE_OPEN_IN_BROWSER = 'ISSUE_OPEN_IN_BROWSER';
+
 // -- Commands -----------------------------------------------------------------
 Jira.prototype.api = null;
 
@@ -153,8 +157,8 @@ Jira.prototype.run = function() {
 
         if (options.transition) {
             if (options.transition === true || options.transition === 'true') {
-                instance.transitionWithQuestion_(options.number, options.transition, function(err, transition) {
-                    if (err || transition) {
+                instance.transitionWithQuestion_(options.number, options.transition, function(err, data) {
+                    if (err || data) {
                         logger.defaultCallback(
                             err, null, logger.compileTemplate('{{jiraIssueLink}}', {
                                 options: options
@@ -921,9 +925,10 @@ Jira.prototype.transition = function(number, name, opt_callback) {
 Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
     var instance = this,
         options = instance.options,
+        config = base.getPluginConfig().plugins,
         action,
         choices,
-        transition,
+        response,
         transitions,
         operations;
 
@@ -942,7 +947,9 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
                 choices.push(val.name);
             });
             choices.push(new inquirer.Separator());
-            choices.push('Nothing, thanks.');
+            choices.push('Assign to me');
+            choices.push('Open in browser');
+            choices.push('Nothing, thanks');
 
             inquirer.prompt(
                 [
@@ -953,7 +960,18 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
                         type: 'list'
                     }
                 ], function(answers) {
-                    action = instance.findFirstArrayValue_(transitions, 'name', answers.transition);
+                    switch (answers.transition) {
+                        case 'Assign to me':
+                            action = Jira.ACTION_ISSUE_ASSIGN_TO_ME;
+                            break;
+                        case 'Open in browser':
+                            action = Jira.ACTION_ISSUE_OPEN_IN_BROWSER;
+                            break;
+                        default:
+                            action = instance.findFirstArrayValue_(
+                                transitions, 'name', answers.transition);
+                    }
+
                     callback();
                 });
         },
@@ -964,19 +982,37 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
                 return;
             }
 
-            logger.logTemplate('{{prefix}} [info] Updating issue');
+            if (action === Jira.ACTION_ISSUE_ASSIGN_TO_ME) {
+                logger.logTemplate('{{prefix}} [info] Assigning issue to {{magentaBright jira.user}}', {
+                    jira: config.jira
+                });
 
-            instance.transition(number, action.name, function(err, data) {
-                if (!err) {
-                    transition = data;
-                }
-                callback(err);
-            });
+                options.assignee = config.jira.user;
+
+                instance.update(options.number, function(err, issue) {
+                    response = issue;
+                    callback(err);
+                });
+            }
+            else if (action === Jira.ACTION_ISSUE_OPEN_IN_BROWSER) {
+                instance.browser(options.number);
+                callback();
+            }
+            else {
+                logger.logTemplate('{{prefix}} [info] Updating issue');
+
+                instance.transition(number, action.name, function(err, data) {
+                    if (!err) {
+                        response = data;
+                    }
+                    callback(err);
+                });
+            }
         }
     ];
 
     async.series(operations, function(err) {
-        opt_callback && opt_callback(err, transition);
+        opt_callback && opt_callback(err, response);
     });
 };
 
