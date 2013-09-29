@@ -43,9 +43,9 @@
     },
     "dependencies": {
         "async": "0.2.7",
+        "inquirer": "0.3.4",
         "jira": "0.7.2",
-        "open": "0.0.3",
-        "prompt": "0.2.9"
+        "open": "0.0.3"
     },
     "devDependencies": {
         "jshint": "2.1.2",
