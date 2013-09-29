@@ -83,7 +83,8 @@ Jira.prototype.api = null;
 Jira.prototype.run = function() {
     var instance = this,
         config = base.getPluginConfig().plugins,
-        options = instance.options;
+        options = instance.options,
+        operations;
 
     instance.api = new jira.JiraApi(
         config.jira.protocol, config.jira.host, config.jira.port,
@@ -99,94 +100,97 @@ Jira.prototype.run = function() {
     options.component = options.component || config.jira.default_issue_component[options.project];
     options.version = options.version || config.jira.default_issue_version[options.project];
 
-    if (options.browser) {
-        if (options.number) {
+    operations = [
+        function(callback) {
+            if (options.number) {
+                callback();
+            }
+            else {
+                instance.getIssueNumberFromCommitMessage_(function(err, data) {
+                    options.number = data;
+                    callback();
+                });
+            }
+        }
+    ];
+
+    async.series(operations, function() {
+        if (options.browser) {
             instance.browser(options.number);
         }
-        else {
-            instance.getIssueNumberFromCommitMessage_(function(err, data) {
-                if (!data) {
-                    logger.defaultCallback('Could not find issue number, try with --number.');
+
+        if (options.comment) {
+            logger.logTemplate(
+                '{{prefix}} [info] Adding comment on issue {{greenBright "#" options.number}}', {
+                    options: options
+                });
+
+            instance.comment(function(err) {
+                logger.defaultCallback(
+                    err, null, logger.compileTemplate('{{jiraIssueLink}}', {
+                        options: options
+                    }));
+            });
+        }
+
+        if (options.new) {
+            logger.logTemplate(
+                '{{prefix}} [info] Creating a new issue on project {{greenBright options.project}}', {
+                    options: options
+                });
+
+            instance.new(function(err, issue) {
+                if (issue) {
+                    options.number = issue.key;
                 }
-                instance.browser(data);
+
+                logger.defaultCallback(
+                    err, null, logger.compileTemplate('{{jiraIssueLink}}', {
+                        options: options
+                    }));
             });
         }
-    }
 
-    if (options.comment) {
-        logger.logTemplate(
-            '{{prefix}} [info] Adding comment on issue {{greenBright "#" options.number}}', {
-                options: options
-            });
-
-        instance.comment(function(err) {
-            logger.defaultCallback(
-                err, null, logger.compileTemplate('{{jiraIssueLink}}', {
-                    options: options
-                }));
-        });
-    }
-
-    if (options.new) {
-        logger.logTemplate(
-            '{{prefix}} [info] Creating a new issue on project {{greenBright options.project}}', {
-                options: options
-            });
-
-        instance.new(function(err, issue) {
-            if (issue) {
-                options.number = issue.key;
+        if (options.transition) {
+            if (options.transition === true || options.transition === 'true') {
+                instance.transitionWithQuestion_(options.number, options.transition, function(err, transition) {
+                    if (err || transition) {
+                        logger.defaultCallback(
+                            err, null, logger.compileTemplate('{{jiraIssueLink}}', {
+                                options: options
+                            }));
+                    }
+                });
             }
+            else {
+                logger.logTemplate(
+                    '{{prefix}} [info] Updating issue {{greenBright options.number}} to {{cyan options.transition}}', {
+                        options: options
+                    });
 
-            logger.defaultCallback(
-                err, null, logger.compileTemplate('{{jiraIssueLink}}', {
-                    options: options
-                }));
-        });
-    }
+                instance.transition(options.number, options.transition, function(err) {
+                    logger.defaultCallback(
+                        err, null, logger.compileTemplate('{{jiraIssueLink}}', {
+                            options: options
+                        }));
+                });
+            }
+        }
 
-    if (options.transition) {
-        if (options.transition === 'true') {
+        if (options.update) {
             logger.logTemplate(
-                '{{prefix}} [info] Listing available transitions for {{greenBright options.number}}', {
+                '{{prefix}} [info] Updating issue {{cyan options.number}}', {
                     options: options
                 });
 
-            instance.transitionWithQuestion_(options.number, options.transition, function(err) {
+            instance.update(options.number, function(err) {
                 logger.defaultCallback(
                     err, null, logger.compileTemplate('{{jiraIssueLink}}', {
                         options: options
                     }));
             });
         }
-        else {
-            logger.logTemplate(
-                '{{prefix}} [info] Updating issue {{greenBright options.number}} to {{magentaBright options.transition}}', {
-                    options: options
-                });
-
-            instance.transition(options.number, options.transition, function(err) {
-                logger.defaultCallback(
-                    err, null, logger.compileTemplate('{{jiraIssueLink}}', {
-                        options: options
-                    }));
-            });
-        }
-    }
-
-    if (options.update) {
-        logger.logTemplate(
-            '{{prefix}} [info] Updating issue {{greenBright options.number}}', {
-                options: options
-            });
-
-        instance.update(options.number, function(err) {
-            logger.defaultCallback(
-                err, null, logger.compileTemplate('{{jiraIssueLink}}', {
-                    options: options
-                }));
-        });
-    }
+    });
 };
 
 Jira.prototype.browser = function(number) {
