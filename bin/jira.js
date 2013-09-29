@@ -156,28 +156,33 @@ Jira.prototype.run = function() {
         }
 
         if (options.transition) {
-            if (options.transition === true || options.transition === 'true') {
-                instance.transitionWithQuestion_(options.number, options.transition, function(err, data) {
-                    if (err || data) {
+            if (options.number) {
+                if (options.transition === true || options.transition === 'true') {
+                    instance.transitionWithQuestion_(options.number, options.transition, function(err, data) {
+                        if (err || data) {
+                            logger.defaultCallback(
+                                err, null, logger.compileTemplate('{{jiraIssueLink}}', {
+                                    options: options
+                                }));
+                        }
+                    });
+                }
+                else {
+                    logger.logTemplate(
+                        '{{prefix}} [info] Updating issue {{greenBright options.number}} to {{cyan options.transition}}', {
+                            options: options
+                        });
+
+                    instance.transition(options.number, options.transition, function(err) {
                         logger.defaultCallback(
                             err, null, logger.compileTemplate('{{jiraIssueLink}}', {
                                 options: options
                             }));
-                    }
-                });
+                    });
+                }
             }
             else {
-                logger.logTemplate(
-                    '{{prefix}} [info] Updating issue {{greenBright options.number}} to {{cyan options.transition}}', {
-                        options: options
-                    });
-
-                instance.transition(options.number, options.transition, function(err) {
-                    logger.defaultCallback(
-                        err, null, logger.compileTemplate('{{jiraIssueLink}}', {
-                            options: options
-                        }));
-                });
+                logger.warn('Skipping JIRA transition, issue number not specified.');
             }
         }
 
