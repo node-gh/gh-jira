@@ -8,6 +8,46 @@
         "LPS": "6.2.X"
     },
     "default_project": "LPS",
+    "hooks": {
+        "fwd": {
+            "before": [],
+            "after": [
+                { "cmd": "ghd", "args": ["jira"] }
+            ]
+        },
+        "pull-request": {
+            "close": {
+                "before": [],
+                "after": [
+                    { "cmd": "ghd", "args": ["jira"] }
+                ]
+            },
+            "fetch": {
+                "before": [],
+                "after": [
+                    { "cmd": "ghd", "args": ["jira"] }
+                ]
+            },
+            "merge": {
+                "before": [],
+                "after": [
+                    { "cmd": "ghd", "args": ["jira"] }
+                ]
+            },
+            "open": {
+                "before": [],
+                "after": [
+                    { "cmd": "ghd", "args": ["jira"] }
+                ]
+            },
+            "submit": {
+                "before": [
+                    { "cmd": "ghd", "args": ["jira"] }
+                ],
+                "after": []
+            }
+        }
+    },
     "host": "issues.liferay.com",
     "password": "",
     "port": "",
