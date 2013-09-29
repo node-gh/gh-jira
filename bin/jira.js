@@ -942,14 +942,15 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
             });
         },
         function(callback) {
-            choices = [];
+            choices = [
+                'Nothing, thanks',
+                'Assign to me',
+                'Open in browser',
+                new inquirer.Separator()
+            ];
             transitions.forEach(function(val) {
                 choices.push(val.name);
             });
-            choices.push(new inquirer.Separator());
-            choices.push('Assign to me');
-            choices.push('Open in browser');
-            choices.push('Nothing, thanks');
 
             inquirer.prompt(
                 [
