@@ -223,7 +223,7 @@ Jira.prototype.comment = function(opt_callback) {
 Jira.prototype.compileObjectValuesTemplate_ = function(o) {
     var instance = this,
         options = instance.options,
-        config = base.getPluginConfig().plugin;
+        config = base.getPluginConfig().plugins;
 
     Object.keys(o).forEach(function(key) {
         var value = o[key];
