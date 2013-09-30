@@ -43,6 +43,7 @@ Jira.DETAILS = {
         'browser': Boolean,
         'comment': String,
         'component': String,
+        'github-user': String,
         'message': String,
         'new': Boolean,
         'number': [String, Array],
@@ -322,6 +323,7 @@ Jira.prototype.expandEmoji_ = function(content) {
 Jira.prototype.expandTransitionPayloadFromConfig_ = function(transitionName, payload, opt_callback) {
     var instance = this,
         config = base.getPluginConfig().plugins,
+        options = instance.options,
         transition = config.jira.transition[transitionName],
         field,
         fields,
@@ -356,8 +358,21 @@ Jira.prototype.expandTransitionPayloadFromConfig_ = function(transitionName, pay
                     }
                 });
 
-                instance.compileObjectValuesTemplate_(payload);
+                callback();
+            },
+            function(callback) {
+                if (!options['github-user']) {
+                    callback();
+                    return;
+                }
 
+                instance.searchUserByGithubUsername_(options['github-user'], function(err, user) {
+                    config.jira.submit = user.name;
+                    callback();
+                });
+            },
+            function(callback) {
+                instance.compileObjectValuesTemplate_(payload);
                 callback();
             }
         ];
