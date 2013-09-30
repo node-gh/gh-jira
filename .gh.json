@@ -9,42 +9,46 @@
     },
     "default_project": "LPS",
     "hooks": {
-        "fwd": {
-            "before": [],
-            "after": [
-                { "cmd": "ghd", "args": ["jira"] }
-            ]
-        },
         "pull-request": {
             "close": {
                 "before": [],
                 "after": [
-                    { "cmd": "ghd", "args": ["jira"] }
+                    { "cmd": "ghd", "args": ["jira", "{{jira.number}}"] }
                 ]
             },
             "fetch": {
                 "before": [],
                 "after": [
-                    { "cmd": "ghd", "args": ["jira"] }
+                    "{{#if jira.number}} ghd jira {{jira.number}} --comment 'Just started reviewing :)' {{/if}}",
+                    { "cmd": "ghd", "args": ["jira", "{{jira.number}}"] }
+                ]
+            },
+            "fwd": {
+                "before": [],
+                "after": [
+                    "{{#if jira.number}} ghd jira {{jira.number}} --comment 'Pull request forwarded to {{forwardedLink}}. [See changes here.]({{compareLink}})' {{/if}}",
+                    { "cmd": "ghd", "args": ["jira", "{{jira.number}}", "--github-user", "{{options.fwd}}", "--submittedLink", "{{forwardedLink}}"] }
                 ]
             },
             "merge": {
                 "before": [],
                 "after": [
-                    { "cmd": "ghd", "args": ["jira"] }
+                    "{{#if jira.number}} ghd jira {{jira.number}} --comment 'Thank you, pull request merged! [See changes here.]({{compareLink}})' {{/if}}",
+                    { "cmd": "ghd", "args": ["jira", "{{jira.number}}"] }
                 ]
             },
             "open": {
                 "before": [],
                 "after": [
-                    { "cmd": "ghd", "args": ["jira"] }
+                    { "cmd": "ghd", "args": ["jira", "{{jira.number}}"] }
                 ]
             },
             "submit": {
-                "before": [
-                    { "cmd": "ghd", "args": ["jira"] }
-                ],
-                "after": []
+                "before": [],
+                "after": [
+                    "{{#if jira.number}} ghd jira {{jira.number}} --comment 'Pull request submitted to {{submittedLink}}. [See changes here.]({{compareLink}})' {{/if}}",
+                    { "cmd": "ghd", "args": ["jira", "{{jira.number}}", "--github-user", "{{options.submit}}", "--submittedLink", "{{submittedLink}}"] }
+                ]
             }
         }
     },
@@ -52,12 +56,18 @@
     "password": "",
     "port": "",
     "protocol": "https",
-    "user": "",
     "transition": {
+        "Reassign Review Request": {
+            "Assignee": {
+                "name": "{{jira.submit}}"
+            },
+            "Git Pull Request": "{{options.submittedLink}}"
+        },
         "Start Progress": {
             "Assignee": {
                 "name": "{{jira.user}}"
             }
         }
-    }
+    },
+    "user": ""
 }
