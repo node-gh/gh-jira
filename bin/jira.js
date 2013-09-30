@@ -43,7 +43,6 @@ Jira.DETAILS = {
         'browser': Boolean,
         'comment': String,
         'component': String,
-        'github-user': String,
         'message': String,
         'new': Boolean,
         'number': [String, Array],
@@ -363,25 +362,25 @@ Jira.prototype.expandTransitionPayloadFromConfig_ = function(transitionName, pay
                 callback();
             },
             function(callback) {
-                if (!options['github-user']) {
+                if (!options.assignee) {
                     callback();
                     return;
                 }
 
-                instance.searchUserByGithubUsername_(options['github-user'], function(err, data) {
+                instance.searchUserByGithubUsername_(options.assignee, function(err, data) {
                     users = data;
                     callback(err);
                 });
             },
             function(callback) {
                 if (users.length === 1) {
-                    config.jira.submit = users[0].name;
+                    options.assignee = users[0].name;
                     callback();
                     return;
                 }
 
                 instance.selectUserWithQuestion_(users, function(username) {
-                    config.jira.submit = username;
+                    options.assignee = username;
                     callback();
                 });
             },
