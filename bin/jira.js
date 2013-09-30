@@ -103,6 +103,18 @@ Jira.getIssueNumberFromText = function(text) {
     }
 };
 
+// Hooks -----------------------------------------------------------------------
+
+exports.setupBeforeHooks = exports.setupAfterHooks = function(context, done) {
+    var config = base.getPluginConfig().plugins;
+
+    Jira.getIssueNumberFromCommitMessage(function(err, data) {
+        context.jira = config.jira;
+        context.jira.number = data;
+        done();
+    });
+};
+
 // -- Commands -----------------------------------------------------------------
 Jira.prototype.api = null;
 
