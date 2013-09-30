@@ -57,6 +57,22 @@
     "port": "",
     "protocol": "https",
     "transition": {
+        "Close Issue": {
+            "Fix Version/s": {
+                "name": "{{options.version}}"
+            }
+        },
+        "Create Review Request": {
+            "Assignee": {
+                "name": "{{jira.submit}}"
+            },
+            "Git Pull Request": "{{options.submittedLink}}"
+        },
+        "Open Issue": {
+            "Assignee": {
+                "name": "{{jira.submit}}"
+            }
+        },
         "Reassign Review Request": {
             "Assignee": {
                 "name": "{{jira.submit}}"
