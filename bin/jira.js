@@ -81,6 +81,28 @@ Jira.ACTION_ISSUE_ASSIGN_TO_ME = 'ISSUE_ASSIGN_TO_ME';
 
 Jira.ACTION_ISSUE_OPEN_IN_BROWSER = 'ISSUE_OPEN_IN_BROWSER';
 
+Jira.getIssueNumberFromCommitMessage = function(opt_callback) {
+    git.getLastCommitMessage(null, function(err, data) {
+        data = Jira.getIssueNumberFromText(data);
+        opt_callback && opt_callback(err, data);
+    });
+};
+
+Jira.getIssueNumberFromText = function(text) {
+    var config = base.getPluginConfig().plugins,
+        project = config.jira.default_project,
+        match,
+        numberRegex;
+
+    if (project) {
+        numberRegex = new RegExp(project + '-[0-9]+');
+
+        if (match = text.match(numberRegex)) {
+            return match[0];
+        }
+    }
+};
+
 // -- Commands -----------------------------------------------------------------
 Jira.prototype.api = null;
 
@@ -110,7 +132,7 @@ Jira.prototype.run = function() {
                 callback();
             }
             else {
-                instance.getIssueNumberFromCommitMessage_(function(err, data) {
+                Jira.getIssueNumberFromCommitMessage(function(err, data) {
                     options.number = data;
                     callback();
                 });
@@ -348,30 +370,6 @@ Jira.prototype.findFirstArrayValue_ = function(values, key, search) {
     });
 
     return value;
-};
-
-Jira.prototype.getIssueNumberBestMatch_ = function(text) {
-    var config = base.getPluginConfig().plugins,
-        project = config.jira.default_project,
-        match,
-        numberRegex;
-
-    if (project) {
-        numberRegex = new RegExp(project + '-[0-9]+');
-
-        if (match = text.match(numberRegex)) {
-            return match[0];
-        }
-    }
-};
-
-Jira.prototype.getIssueNumberFromCommitMessage_ = function(opt_callback) {
-    var instance = this;
-
-    git.getLastCommitMessage(null, function(err, data) {
-        data = instance.getIssueNumberBestMatch_(data);
-        opt_callback && opt_callback(err, data);
-    });
 };
 
 Jira.prototype.getFields_ = function(opt_callback) {
