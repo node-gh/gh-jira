@@ -64,18 +64,18 @@
         },
         "Create Review Request": {
             "Assignee": {
-                "name": "{{jira.submit}}"
+                "name": "{{options.assignee}}"
             },
             "Git Pull Request": "{{options.submittedLink}}"
         },
         "Open Issue": {
             "Assignee": {
-                "name": "{{jira.submit}}"
+                "name": "{{options.assignee}}"
             }
         },
         "Reassign Review Request": {
             "Assignee": {
-                "name": "{{jira.submit}}"
+                "name": "{{options.assignee}}"
             },
             "Git Pull Request": "{{options.submittedLink}}"
         },
