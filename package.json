@@ -1,37 +1,23 @@
 {
-    "name": "gh-boilerplate",
-    "description": "NodeGH plugin for demonstrating how to create NodeGH plugins",
+    "name": "gh-jira",
+    "description": "NodeGH plugin for integrating Jira, an issue management system",
     "version": "0.1.0",
     "author": {
-        "name": "Author",
-        "email": "email@email.com",
-        "web": "http://www.nodegh.io",
-        "twitter": "author"
+        "name": "Eduardo Lundgren",
+        "email": "eduardolundgren@gmail.com",
+        "web": "http://www.eduardo.io",
+        "twitter": "eduardolundgren"
     },
-    "contributors": [
-        {
-            "name": "Eduardo Lundgren",
-            "email": "eduardolundgren@gmail.com",
-            "web": "http://www.eduardo.io",
-            "twitter": "eduardolundgren"
-        },
-        {
-            "name": "Zeno Rocha",
-            "email": "zno.rocha@gmail.com",
-            "web": "http://zenorocha.com",
-            "twitter": "zenorocha"
-        }
-    ],
     "license": "BSD",
     "repository": {
         "type": "git",
-        "url": "git@github.com:node-gh/gh-boilerplate.git"
+        "url": "git@github.com:node-gh/gh-jira.git"
     },
     "bugs": {
-        "url": "https://github.com/node-gh/gh-boilerplate/issues"
+        "url": "https://github.com/node-gh/gh-jira/issues"
     },
     "keywords": [
-        "gh", "nodegh", "boilerplate", "plugin"
+        "gh", "nodegh", "jira", "plugin"
     ],
     "bin": {
         "gh-ji": "bin/jira.js",
@@ -55,7 +41,7 @@
         "node": ">=0.8"
     },
     "peerDependencies": {
-        "gh": ">=1.4.0"
+        "gh": ">=1.7.0"
     },
     "preferGlobal": "true"
 }
