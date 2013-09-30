@@ -328,7 +328,8 @@ Jira.prototype.expandTransitionPayloadFromConfig_ = function(transitionName, pay
         transition = config.jira.transition[transitionName],
         field,
         fields,
-        operations;
+        operations,
+        users;
 
     if (transition) {
         operations = [
@@ -367,8 +368,20 @@ Jira.prototype.expandTransitionPayloadFromConfig_ = function(transitionName, pay
                     return;
                 }
 
-                instance.searchUserByGithubUsername_(options['github-user'], function(err, user) {
-                    config.jira.submit = user.name;
+                instance.searchUserByGithubUsername_(options['github-user'], function(err, data) {
+                    users = data;
+                    callback(err);
+                });
+            },
+            function(callback) {
+                if (users.length === 1) {
+                    config.jira.submit = users[0].name;
+                    callback();
+                    return;
+                }
+
+                instance.selectUserWithQuestion_(users, function(username) {
+                    config.jira.submit = username;
                     callback();
                 });
             },
@@ -814,27 +827,27 @@ Jira.prototype.registerLoggerHelpers_ = function() {
 Jira.prototype.searchUser_ = function(query, opt_callback) {
     var instance = this;
 
-    instance.api.searchUsers(query, 0, 1, true, false, opt_callback);
+    instance.api.searchUsers(query, 0, 50, true, false, opt_callback);
 };
 
 Jira.prototype.searchUserByGithubUsername_ = function(query, opt_callback) {
     var instance = this,
         operations,
-        user,
+        users,
         userGithub;
 
     operations = [
         function(callback) {
             instance.searchUser_(query, function(err, data) {
                 if (!err && data.length) {
-                    user = data[0];
+                    users = data;
                 }
                 callback(err);
             });
         },
         function(callback) {
             // If user was found on jira do not call github search.
-            if (user) {
+            if (users) {
                 callback();
                 return;
             }
@@ -853,7 +866,7 @@ Jira.prototype.searchUserByGithubUsername_ = function(query, opt_callback) {
         function(callback) {
             instance.searchUser_(userGithub.name, function(err, data) {
                 if (!err && data.length) {
-                    user = data[0];
+                    users = data;
                 }
                 callback(err);
             });
@@ -861,8 +874,28 @@ Jira.prototype.searchUserByGithubUsername_ = function(query, opt_callback) {
     ];
 
     async.series(operations, function(err) {
-        opt_callback && opt_callback(err, user);
+        opt_callback && opt_callback(err, users);
     });
+};
+
+Jira.prototype.selectUserWithQuestion_ = function(users, callback) {
+    var choices = [];
+
+    users.forEach(function(user) {
+        choices.push(user.name);
+    });
+
+    inquirer.prompt(
+        [
+            {
+                choices: choices,
+                message: 'Which user are you looking for?',
+                name: 'username',
+                type: 'list'
+            }
+        ], function(answers) {
+            callback(answers.username);
+        });
 };
 
 Jira.prototype.transition = function(number, name, opt_callback) {
