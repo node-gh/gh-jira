@@ -81,8 +81,8 @@ Jira.ACTION_ISSUE_ASSIGN_TO_ME = 'ISSUE_ASSIGN_TO_ME';
 
 Jira.ACTION_ISSUE_OPEN_IN_BROWSER = 'ISSUE_OPEN_IN_BROWSER';
 
-Jira.getIssueNumberFromCommitMessage = function(opt_callback) {
-    git.getLastCommitMessage(null, function(err, data) {
+Jira.getIssueNumberFromCommitMessage = function(opt_branch, opt_callback) {
+    git.getLastCommitMessage(opt_branch, function(err, data) {
         data = Jira.getIssueNumberFromText(data);
         opt_callback && opt_callback(err, data);
     });
@@ -106,9 +106,10 @@ Jira.getIssueNumberFromText = function(text) {
 // Hooks -----------------------------------------------------------------------
 
 exports.setupBeforeHooks = exports.setupAfterHooks = function(context, done) {
-    var config = base.getPluginConfig().plugins;
+    var config = base.getPluginConfig().plugins,
+        options = context.options;
 
-    Jira.getIssueNumberFromCommitMessage(function(err, data) {
+    Jira.getIssueNumberFromCommitMessage(options.pullBranch, function(err, data) {
         context.jira = config.jira;
         context.jira.number = data;
         done();
@@ -144,7 +145,7 @@ Jira.prototype.run = function() {
                 callback();
             }
             else {
-                Jira.getIssueNumberFromCommitMessage(function(err, data) {
+                Jira.getIssueNumberFromCommitMessage(null, function(err, data) {
                     options.number = data;
                     callback();
                 });
