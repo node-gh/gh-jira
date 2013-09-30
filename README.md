@@ -9,34 +9,119 @@ NodeGH plugin for integrating [Jira](https://www.atlassian.com/software/jira), a
 ## Install
 
 ```
-[sudo] npm install -g gh-boilerplate
+[sudo] npm install -g gh-jira
 ```
 
 ## Usage
 
 ```
-gh boilerplate
+gh jira
 ```
 
-> **Alias:** `gh bo`
+> **Alias:** `gh ji`
+
+### 1. Create
 
 Option             | Usage        | Type
 ---                | ---          | ---
-`-f`, `--foo`      | **Required** | `String`
+`-N`, `--new`      | **Required** | `Boolean`
+`-p`, `--project`  | **Required** | `String`
+`-t`, `--title`    | **Required** | `String`
+`-A`, `--assignee` | *Optional*   | `String`
+`-C`, `--component`| *Optional*   | `String`
+`-m`, `--message`  | *Optional*   | `String`
+`-P`, `--priority` | *Optional*   | `String`
+`-R`, `--reporter` | *Optional*   | `String`
+`-t`, `--type`     | *Optional*   | `String`
+`-v`, `--version`  | *Optional*   | `String`
 
 #### Examples
 
-* **Shortcut** for showing hello world message.
+* Create a new issue on a certain project.
 
-	```
-gh bo
-	```
+    ```
+gh jira --new --title 'Node GH rocks!' --message 'Body with **Markdown** support' --project LPS
+    ```
 
-* Show hello world message.
+* Create a new issue specifying the component.
 
-	```
-gh bo --foo
-	```
+    ```
+gh jira --new --title 'Node GH rocks!' --component UI
+    ```
+
+* Create a new issue and assign it to someone.
+
+    ```
+gh jira --new --title 'Node GH rocks!' --assignee eduardolundgren
+    ```
+
+### 2. Comment
+
+Option           | Usage        | Type
+---              | ---          | ---
+`-c`, `--comment`| **Required** | `String`
+`-n`, `--number` | **Required** | `Number`
+
+Omitting `--number` will guess issue number from the last commit message.
+
+#### Examples
+
+* Comment on an issue.
+
+    ```
+gh jira LPS-123 --comment "Merged, **thank you**!"
+    ```
+
+### 3. Open in Browser
+
+Option                 | Usage        | Type
+---                    | ---          | ---
+`-B`, `--browser`      | **Required** | `Boolean`
+`-n`, `--number`       | **Required** | `Number`
+
+Omitting `--number` will guess issue number from the last commit message.
+
+#### Examples
+
+* Open Jira issue page in the browser.
+
+    ```
+gh jira LPS-123 --browser
+    ```
+
+### 4. Transition
+
+Option             | Usage        | Type
+---                | ---          | ---
+`--transition`     | **Required** | `String`
+`-n`, `--number`   | **Required** | `Number`
+`-A`, `--assignee` | *Optional*   | `String`
+`-m`, `--message`  | *Optional*   | `String`
+`--resolution`     | *Optional*   | `String`
+
+Omitting `--number` will guess issue number from the last commit message.
+
+Both Jira and GitHub usernames are supported `--assignee` values.
+
+#### Examples
+
+* Start progress on an issue.
+
+    ```
+gh jira LPS-123 --transition "Start Progress"
+    ```
+
+* Show valid transitions for the issue.
+
+    ```
+gh jira LPS-123 --transition
+    ```
+
+* Show valid transitions for the issue and assign to an user.
+
+    ```
+gh jira LPS-123 --assignee brianchandotcom --transition
+    ```
 
 ## Testing
 
@@ -64,8 +149,7 @@ npm run-script test
 
 ## History
 
-* v0.0.1 September 12, 2013
-	* Start plugin using [gh-boilerplate](https://github.com/node-gh/gh-boilerplate)
+Check [Release](https://github.com/node-gh/gh-jira/releases) list.
 
 ## License
 
