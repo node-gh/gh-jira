@@ -13,41 +13,41 @@
             "close": {
                 "before": [],
                 "after": [
-                    { "cmd": "ghd", "args": ["jira", "{{jira.number}}"] }
+                    { "cmd": "gh", "args": ["jira", "{{jira.number}}"] }
                 ]
             },
             "fetch": {
                 "before": [],
                 "after": [
-                    "{{#if jira.number}} ghd jira {{jira.number}} --comment 'Just started reviewing :)' {{/if}}",
-                    { "cmd": "ghd", "args": ["jira", "{{jira.number}}"] }
+                    "{{#if jira.number}} gh jira {{jira.number}} --comment 'Just started reviewing :)' {{/if}}",
+                    { "cmd": "gh", "args": ["jira", "{{jira.number}}"] }
                 ]
             },
             "fwd": {
                 "before": [],
                 "after": [
-                    "{{#if jira.number}} ghd jira {{jira.number}} --comment 'Pull request forwarded to {{forwardedLink}}. [See changes here.]({{compareLink}})' {{/if}}",
-                    { "cmd": "ghd", "args": ["jira", "{{jira.number}}", "--github-user", "{{options.fwd}}", "--submittedLink", "{{forwardedLink}}"] }
+                    "{{#if jira.number}} gh jira {{jira.number}} --comment 'Pull request forwarded to {{forwardedLink}}. [See changes here.]({{compareLink}})' {{/if}}",
+                    { "cmd": "gh", "args": ["jira", "{{jira.number}}", "--github-user", "{{options.fwd}}", "--submittedLink", "{{forwardedLink}}"] }
                 ]
             },
             "merge": {
                 "before": [],
                 "after": [
-                    "{{#if jira.number}} ghd jira {{jira.number}} --comment 'Thank you, pull request merged! [See changes here.]({{compareLink}})' {{/if}}",
-                    { "cmd": "ghd", "args": ["jira", "{{jira.number}}"] }
+                    "{{#if jira.number}} gh jira {{jira.number}} --comment 'Thank you, pull request merged! [See changes here.]({{compareLink}})' {{/if}}",
+                    { "cmd": "gh", "args": ["jira", "{{jira.number}}"] }
                 ]
             },
             "open": {
                 "before": [],
                 "after": [
-                    { "cmd": "ghd", "args": ["jira", "{{jira.number}}"] }
+                    { "cmd": "gh", "args": ["jira", "{{jira.number}}"] }
                 ]
             },
             "submit": {
                 "before": [],
                 "after": [
-                    "{{#if jira.number}} ghd jira {{jira.number}} --comment 'Pull request submitted to {{submittedLink}}. [See changes here.]({{compareLink}})' {{/if}}",
-                    { "cmd": "ghd", "args": ["jira", "{{jira.number}}", "--github-user", "{{options.submit}}", "--submittedLink", "{{submittedLink}}"] }
+                    "{{#if jira.number}} gh jira {{jira.number}} --comment 'Pull request submitted to {{submittedLink}}. [See changes here.]({{compareLink}})' {{/if}}",
+                    { "cmd": "gh", "args": ["jira", "{{jira.number}}", "--github-user", "{{options.submit}}", "--submittedLink", "{{submittedLink}}"] }
                 ]
             }
         }
