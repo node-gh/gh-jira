@@ -124,7 +124,8 @@ Jira.prototype.run = function() {
     var instance = this,
         config = base.getPluginConfig().plugins,
         options = instance.options,
-        operations;
+        operations,
+        users;
 
     instance.api = new jira.JiraApi(
         config.jira.protocol, config.jira.host, config.jira.port,
@@ -151,7 +152,35 @@ Jira.prototype.run = function() {
                     callback();
                 });
             }
-        }
+        },
+        function(callback) {
+            if (options.assignee) {
+                callback();
+                return;
+            }
+
+            instance.searchUserByGithubUsername_(options.assignee, function(err, data) {
+                users = data;
+                callback(err);
+            });
+        },
+        function(callback) {
+            if (!users || (users.length === 0)) {
+                callback();
+                return;
+            }
+
+            if (users.length === 1) {
+                options.assignee = users[0].name;
+                callback();
+                return;
+            }
+
+            instance.selectUserWithQuestion_(users, function(username) {
+                options.assignee = username;
+                callback();
+            });
+        },
     ];
 
     async.series(operations, function() {
@@ -323,12 +352,10 @@ Jira.prototype.expandEmoji_ = function(content) {
 Jira.prototype.expandTransitionPayloadFromConfig_ = function(transitionName, payload, opt_callback) {
     var instance = this,
         config = base.getPluginConfig().plugins,
-        options = instance.options,
         transition = config.jira.transition[transitionName],
         field,
         fields,
-        operations,
-        users;
+        operations;
 
     if (transition) {
         operations = [
@@ -360,29 +387,6 @@ Jira.prototype.expandTransitionPayloadFromConfig_ = function(transitionName, pay
                 });
 
                 callback();
-            },
-            function(callback) {
-                if (!options.assignee) {
-                    callback();
-                    return;
-                }
-
-                instance.searchUserByGithubUsername_(options.assignee, function(err, data) {
-                    users = data;
-                    callback(err);
-                });
-            },
-            function(callback) {
-                if (users.length === 1) {
-                    options.assignee = users[0].name;
-                    callback();
-                    return;
-                }
-
-                instance.selectUserWithQuestion_(users, function(username) {
-                    options.assignee = username;
-                    callback();
-                });
             },
             function(callback) {
                 instance.compileObjectValuesTemplate_(payload);
