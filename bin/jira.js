@@ -124,8 +124,7 @@ Jira.prototype.run = function() {
     var instance = this,
         config = base.getPluginConfig().plugins,
         options = instance.options,
-        operations,
-        users;
+        operations;
 
     instance.api = new jira.JiraApi(
         config.jira.protocol, config.jira.host, config.jira.port,
@@ -154,33 +153,29 @@ Jira.prototype.run = function() {
             }
         },
         function(callback) {
-            if (options.assignee) {
+            if (!options.originalAssignee) {
                 callback();
                 return;
             }
 
-            instance.searchUserByGithubUsername_(options.assignee, function(err, data) {
-                users = data;
-                callback(err);
+            instance.searchUserByGithubUsername_(options.assignee, function(err, users) {
+                if (err) {
+                    callback(err);
+                    return;
+                }
+
+                if (users.length > 1) {
+                    instance.selectUserWithQuestion_(users, function(username) {
+                        options.assignee = username;
+                        callback();
+                    });
+                }
+                else {
+                    options.assignee = users[0].name;
+                    callback();
+                }
             });
-        },
-        function(callback) {
-            if (!users || (users.length === 0)) {
-                callback();
-                return;
-            }
-
-            if (users.length === 1) {
-                options.assignee = users[0].name;
-                callback();
-                return;
-            }
-
-            instance.selectUserWithQuestion_(users, function(username) {
-                options.assignee = username;
-                callback();
-            });
-        },
+        }
     ];
 
     async.series(operations, function() {
