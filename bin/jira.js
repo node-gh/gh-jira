@@ -126,10 +126,6 @@ Jira.prototype.run = function() {
         options = instance.options,
         operations;
 
-    instance.api = new jira.JiraApi(
-        config.jira.protocol, config.jira.host, config.jira.port,
-        config.jira.user, config.jira.password, config.jira.api_version);
-
     instance.registerLoggerHelpers_();
 
     options.originalAssignee = options.assignee;
@@ -141,6 +137,39 @@ Jira.prototype.run = function() {
     options.version = options.version || config.jira.default_issue_version[options.project];
 
     operations = [
+        function(callback) {
+            if (config.jira.user && config.jira.password) {
+                callback();
+                return;
+            }
+
+            inquirer.prompt(
+                [
+                    {
+                        type: 'input',
+                        message: 'Enter your JIRA user',
+                        name: 'user'
+                    },
+                    {
+                        type: 'password',
+                        message: 'Enter your JIRA password',
+                        name: 'password'
+                    }
+                ], function(answers) {
+                    config.jira.user = answers.user;
+                    config.jira.password = answers.password;
+                    base.writeGlobalConfig('plugins.jira', answers);
+                    logger.success('Writing GH config data: ' + base.getUserHomePath());
+                    callback();
+                });
+        },
+        function(callback) {
+            instance.api = new jira.JiraApi(
+                config.jira.protocol, config.jira.host, config.jira.port,
+                config.jira.user, config.jira.password, config.jira.api_version);
+
+            callback();
+        },
         function(callback) {
             if (options.number) {
                 callback();
