@@ -873,7 +873,7 @@ Jira.prototype.searchUserByGithubUsername_ = function(query, opt_callback) {
             });
         },
         function(callback) {
-            // If user was found on jira do not call github search.
+            // If any user was found on jira do not call github search.
             if (users) {
                 callback();
                 return;
@@ -891,6 +891,12 @@ Jira.prototype.searchUserByGithubUsername_ = function(query, opt_callback) {
             });
         },
         function(callback) {
+            // If any user or github user was found on jira do not call github search.
+            if (users || !userGithub) {
+                callback();
+                return;
+            }
+
             instance.searchUser_(userGithub.name, function(err, data) {
                 if (!err && data.length) {
                     users = data;
