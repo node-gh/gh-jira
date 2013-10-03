@@ -37,12 +37,6 @@
                     { "cmd": "gh", "args": ["jira", "{{jira.number}}"] }
                 ]
             },
-            "open": {
-                "before": [],
-                "after": [
-                    { "cmd": "gh", "args": ["jira", "{{jira.number}}"] }
-                ]
-            },
             "submit": {
                 "before": [],
                 "after": [
