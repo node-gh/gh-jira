@@ -27,7 +27,7 @@
                 "before": [],
                 "after": [
                     "{{#if jira.number}} gh jira {{jira.number}} --comment 'Pull request forwarded to {{forwardedLink}}. [See changes here.]({{compareLink}})' {{/if}}",
-                    { "cmd": "gh", "args": ["jira", "{{jira.number}}", "--github-user", "{{options.fwd}}", "--submittedLink", "{{forwardedLink}}"] }
+                    { "cmd": "gh", "args": ["jira", "{{jira.number}}", "--assignee", "{{options.fwd}}", "--submittedLink", "{{forwardedLink}}"] }
                 ]
             },
             "merge": {
@@ -41,7 +41,7 @@
                 "before": [],
                 "after": [
                     "{{#if jira.number}} gh jira {{jira.number}} --comment 'Pull request submitted to {{submittedLink}}. [See changes here.]({{compareLink}})' {{/if}}",
-                    { "cmd": "gh", "args": ["jira", "{{jira.number}}", "--github-user", "{{options.submit}}", "--submittedLink", "{{submittedLink}}"] }
+                    { "cmd": "gh", "args": ["jira", "{{jira.number}}", "--assignee", "{{options.submit}}", "--submittedLink", "{{submittedLink}}"] }
                 ]
             }
         }
