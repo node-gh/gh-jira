@@ -156,6 +156,8 @@ Jira.prototype.run = function() {
         options = instance.options,
         operations;
 
+    instance.expandAliases_(options);
+
     instance.registerLoggerHelpers_();
 
     options.originalAssignee = options.assignee;
@@ -389,6 +391,12 @@ Jira.prototype.deleteObjectEmptyValues_ = function(o) {
             delete o[key];
         }
     });
+};
+
+Jira.prototype.expandAliases_ = function(options) {
+    if (config.alias) {
+        options.assignee = config.alias[options.assignee] || options.assignee;
+    }
 };
 
 Jira.prototype.expandComment_ = function(comment) {
