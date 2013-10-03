@@ -90,7 +90,7 @@ Jira.getIssueNumberFromCommitMessage = function(opt_branch, opt_callback) {
 };
 
 Jira.getIssueNumberFromText = function(text) {
-    var config = base.getPluginConfig().plugins,
+    var config = base.getPluginConfig('jira').plugins,
         project = config.jira.default_project,
         match,
         numberRegex;
