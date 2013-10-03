@@ -84,24 +84,55 @@ Jira.ACTION_ISSUE_ASSIGN_TO_ME = 'ISSUE_ASSIGN_TO_ME';
 
 Jira.ACTION_ISSUE_OPEN_IN_BROWSER = 'ISSUE_OPEN_IN_BROWSER';
 
-Jira.getIssueNumberFromCommitMessage = function(opt_branch, opt_callback) {
-    git.getLastCommitMessage(opt_branch, function(err, data) {
-        data = Jira.getIssueNumberFromText(data);
-        opt_callback && opt_callback(err, data);
+Jira.getIssueNumber = function(opt_branch, opt_callback) {
+    var operations,
+        number;
+
+    operations = [
+        function(callback) {
+            if (opt_branch) {
+                number = Jira.getIssueNumberFromText(opt_branch);
+            }
+            callback();
+        },
+        function(callback) {
+            if (number) {
+                callback();
+                return;
+            }
+
+            git.getCurrentBranch(function(err, data) {
+                number = Jira.getIssueNumberFromText(data);
+                callback();
+            });
+        },
+        function(callback) {
+            if (number) {
+                callback();
+                return;
+            }
+
+            git.getLastCommitMessage(opt_branch, function(err, data) {
+                number = Jira.getIssueNumberFromText(data);
+                callback();
+            });
+        }
+    ];
+
+    async.series(operations, function(err) {
+        opt_callback && opt_callback(err, number);
     });
 };
 
 Jira.getIssueNumberFromText = function(text) {
-    var project = jiraConfig.default_project,
-        match,
-        numberRegex;
+    var match;
 
-    if (project) {
-        numberRegex = new RegExp(project + '-[0-9]+');
+    // Try uppercase sequence first, e.g. FOO-123.
+    // If not found, try case-insensitive sequence, e.g. foo-123.
+    match = text.match(/[A-Z]{3,}-\d+/) || text.match(/[a-z]{3,}-\d+/i);
 
-        if (match = text.match(numberRegex)) {
-            return match[0];
-        }
+    if (match) {
+        return match[0];
     }
 };
 
@@ -110,7 +141,7 @@ Jira.getIssueNumberFromText = function(text) {
 exports.setupBeforeHooks = exports.setupAfterHooks = function(context, done) {
     var options = context.options;
 
-    Jira.getIssueNumberFromCommitMessage(options.pullBranch, function(err, data) {
+    Jira.getIssueNumber(options.pullBranch, function(err, data) {
         context.jira = jiraConfig;
         context.jira.number = data;
         done();
@@ -174,7 +205,7 @@ Jira.prototype.run = function() {
                 callback();
             }
             else {
-                Jira.getIssueNumberFromCommitMessage(null, function(err, data) {
+                Jira.getIssueNumber(null, function(err, data) {
                     options.number = data;
                     callback();
                 });
