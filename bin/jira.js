@@ -19,7 +19,9 @@ var async = require('async'),
     openUrl = require('open'),
     base = require(GH_PATH + 'lib/base'),
     git = require(GH_PATH + 'lib/git'),
-    logger = require(GH_PATH + 'lib/logger');
+    logger = require(GH_PATH + 'lib/logger'),
+    config = base.getConfig(true),
+    jiraConfig = config.plugins.jira;
 
 // -- Constructor --------------------------------------------------------------
 
@@ -90,8 +92,7 @@ Jira.getIssueNumberFromCommitMessage = function(opt_branch, opt_callback) {
 };
 
 Jira.getIssueNumberFromText = function(text) {
-    var config = base.getPluginConfig('jira').plugins,
-        project = config.jira.default_project,
+    var project = jiraConfig.default_project,
         match,
         numberRegex;
 
@@ -107,11 +108,10 @@ Jira.getIssueNumberFromText = function(text) {
 // Hooks -----------------------------------------------------------------------
 
 exports.setupBeforeHooks = exports.setupAfterHooks = function(context, done) {
-    var config = base.getPluginConfig().plugins,
-        options = context.options;
+    var options = context.options;
 
     Jira.getIssueNumberFromCommitMessage(options.pullBranch, function(err, data) {
-        context.jira = config.jira;
+        context.jira = jiraConfig;
         context.jira.number = data;
         done();
     });
@@ -122,23 +122,22 @@ Jira.prototype.api = null;
 
 Jira.prototype.run = function() {
     var instance = this,
-        config = base.getPluginConfig().plugins,
         options = instance.options,
         operations;
 
     instance.registerLoggerHelpers_();
 
     options.originalAssignee = options.assignee;
-    options.assignee = options.assignee || config.jira.user;
-    options.project = options.project || config.jira.default_project;
-    options.reporter = options.reporter || config.jira.user;
-    options.type = options.type || config.jira.default_issue_type;
-    options.component = options.component || config.jira.default_issue_component[options.project];
-    options.version = options.version || config.jira.default_issue_version[options.project];
+    options.assignee = options.assignee || jiraConfig.user;
+    options.project = options.project || jiraConfig.default_project;
+    options.reporter = options.reporter || jiraConfig.user;
+    options.type = options.type || jiraConfig.default_issue_type;
+    options.component = options.component || jiraConfig.default_issue_component[options.project];
+    options.version = options.version || jiraConfig.default_issue_version[options.project];
 
     operations = [
         function(callback) {
-            if (config.jira.user && config.jira.password) {
+            if (jiraConfig.user && jiraConfig.password) {
                 callback();
                 return;
             }
@@ -156,8 +155,8 @@ Jira.prototype.run = function() {
                         name: 'password'
                     }
                 ], function(answers) {
-                    config.jira.user = answers.user;
-                    config.jira.password = answers.password;
+                    jiraConfig.user = answers.user;
+                    jiraConfig.password = answers.password;
                     base.writeGlobalConfig('plugins.jira', answers);
                     logger.success('Writing GH config data: ' + base.getUserHomePath());
                     callback();
@@ -165,8 +164,8 @@ Jira.prototype.run = function() {
         },
         function(callback) {
             instance.api = new jira.JiraApi(
-                config.jira.protocol, config.jira.host, config.jira.port,
-                config.jira.user, config.jira.password, config.jira.api_version);
+                jiraConfig.protocol, jiraConfig.host, jiraConfig.port,
+                jiraConfig.user, jiraConfig.password, jiraConfig.api_version);
 
             callback();
         },
@@ -329,8 +328,7 @@ Jira.prototype.comment = function(opt_callback) {
 
 Jira.prototype.compileObjectValuesTemplate_ = function(o) {
     var instance = this,
-        options = instance.options,
-        config = base.getPluginConfig().plugins;
+        options = instance.options;
 
     Object.keys(o).forEach(function(key) {
         var value = o[key];
@@ -340,7 +338,7 @@ Jira.prototype.compileObjectValuesTemplate_ = function(o) {
         }
         else {
             o[key] = logger.compileTemplate(value, {
-                jira: config.jira,
+                jira: jiraConfig,
                 options: options
             });
         }
@@ -363,8 +361,7 @@ Jira.prototype.deleteObjectEmptyValues_ = function(o) {
 };
 
 Jira.prototype.expandComment_ = function(comment) {
-    var instance = this,
-        config = base.getPluginConfig();
+    var instance = this;
 
     return '{markdown}' + comment + instance.expandEmoji_(config.signature) + '{markdown}';
 };
@@ -375,8 +372,7 @@ Jira.prototype.expandEmoji_ = function(content) {
 
 Jira.prototype.expandTransitionPayloadFromConfig_ = function(transitionName, payload, opt_callback) {
     var instance = this,
-        config = base.getPluginConfig().plugins,
-        transition = config.jira.transition[transitionName],
+        transition = jiraConfig.transition[transitionName],
         field,
         fields,
         operations;
@@ -525,12 +521,10 @@ Jira.prototype.getIssueTypes_ = function(opt_callback) {
 };
 
 Jira.prototype.getIssueUrl_ = function(number) {
-    var config = base.getPluginConfig().plugins;
-
     return url.format({
-        protocol: config.jira.protocol,
-        hostname: config.jira.host,
-        port: config.jira.port,
+        protocol: jiraConfig.protocol,
+        hostname: jiraConfig.host,
+        port: jiraConfig.port,
         pathname: '/browse/' + number
     });
 };
@@ -1025,7 +1019,6 @@ Jira.prototype.transition = function(number, name, opt_callback) {
 Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
     var instance = this,
         options = instance.options,
-        config = base.getPluginConfig().plugins,
         action,
         choices,
         response,
@@ -1085,10 +1078,10 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
 
             if (action === Jira.ACTION_ISSUE_ASSIGN_TO_ME) {
                 logger.logTemplate('{{prefix}} [info] Assigning issue to {{magentaBright jira.user}}', {
-                    jira: config.jira
+                    jira: jiraConfig
                 });
 
-                options.assignee = config.jira.user;
+                options.assignee = jiraConfig.user;
 
                 instance.update(options.number, function(err, issue) {
                     response = issue;
