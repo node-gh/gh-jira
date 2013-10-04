@@ -385,6 +385,7 @@ Jira.prototype.deleteObjectEmptyValues_ = function(o) {
 Jira.prototype.expandAliases_ = function(options) {
     if (config.alias) {
         options.assignee = config.alias[options.assignee] || options.assignee;
+        options.reporter = config.alias[options.reporter] || options.reporter;
     }
 };
 
