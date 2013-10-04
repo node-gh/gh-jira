@@ -133,7 +133,7 @@ Jira.getIssueNumberFromText = function(text) {
     match = text.match(/[A-Z]{3,}-\d+/) || text.match(/[a-z]{3,}-\d+/i);
 
     if (match) {
-        return match[0];
+        return match[0].toUpperCase();
     }
 };
 
