@@ -7,7 +7,6 @@
     "default_issue_version": {
         "LPS": "6.2.X"
     },
-    "default_project": "LPS",
     "hooks": {
         "pull-request": {
             "close": {

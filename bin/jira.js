@@ -163,11 +163,7 @@ Jira.prototype.run = function() {
 
     options.originalAssignee = options.assignee;
     options.assignee = options.assignee || jiraConfig.user;
-    options.project = options.project || jiraConfig.default_project;
     options.reporter = options.reporter || jiraConfig.user;
-    options.type = options.type || jiraConfig.default_issue_type;
-    options.component = options.component || jiraConfig.default_issue_component[options.project];
-    options.version = options.version || jiraConfig.default_issue_version[options.project];
 
     operations = [
         function(callback) {
@@ -197,6 +193,13 @@ Jira.prototype.run = function() {
                     callback();
                 });
             }
+        },
+        function(callback) {
+            options.project = options.project || instance.getProjectName_(options.number);
+            options.component = options.component || jiraConfig.default_issue_component[options.project];
+            options.type = options.type || jiraConfig.default_issue_type[options.project];
+            options.version = options.version || jiraConfig.default_issue_version[options.project];
+            callback();
         },
         function(callback) {
             if (!options.originalAssignee) {
@@ -552,6 +555,12 @@ Jira.prototype.getIssueUrl_ = function(number) {
         port: jiraConfig.port,
         protocol: jiraConfig.protocol
     });
+};
+
+Jira.prototype.getProjectName_ = function(number) {
+    if (number) {
+        return number.substring(0, number.indexOf('-'));
+    }
 };
 
 Jira.prototype.getUpdatePayload_ = function(opt_callback) {
