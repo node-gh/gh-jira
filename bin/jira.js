@@ -172,28 +172,12 @@ Jira.prototype.run = function() {
         function(callback) {
             if (jiraConfig.user && jiraConfig.password) {
                 callback();
-                return;
             }
-
-            inquirer.prompt(
-                [
-                    {
-                        type: 'input',
-                        message: 'Enter your JIRA user',
-                        name: 'user'
-                    },
-                    {
-                        type: 'password',
-                        message: 'Enter your JIRA password',
-                        name: 'password'
-                    }
-                ], function(answers) {
-                    jiraConfig.user = answers.user;
-                    jiraConfig.password = answers.password;
-                    base.writeGlobalConfig('plugins.jira', answers);
+            else {
+                instance.login_(function() {
                     logger.success('Writing GH config data: ' + base.getUserHomePath());
-                    callback();
                 });
+            }
         },
         function(callback) {
             instance.api = new jira.JiraApi(
@@ -843,6 +827,29 @@ Jira.prototype.getVersions_ = function(project, opt_callback) {
     instance.api.getVersions(project, function(err, types) {
         opt_callback && opt_callback(err, types);
     });
+};
+
+Jira.prototype.login_ = function(opt_callback) {
+    inquirer.prompt(
+        [
+            {
+                type: 'input',
+                message: 'Enter your JIRA user',
+                name: 'user'
+            },
+            {
+                type: 'password',
+                message: 'Enter your JIRA password',
+                name: 'password'
+            }
+        ], function(answers) {
+            jiraConfig.user = answers.user;
+            jiraConfig.password = answers.password;
+
+            base.writeGlobalConfig('plugins.jira', answers);
+
+            opt_callback && opt_callback();
+        });
 };
 
 Jira.prototype.new = function(opt_callback) {
