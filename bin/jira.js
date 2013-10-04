@@ -13,13 +13,13 @@ var GH_PATH = process.env.GH_PATH;
 
 // -- Requires -----------------------------------------------------------------
 var async = require('async'),
-    inquirer = require('inquirer'),
-    jira = require('jira'),
-    url = require('url'),
-    openUrl = require('open'),
     base = require(GH_PATH + 'lib/base'),
     git = require(GH_PATH + 'lib/git'),
+    inquirer = require('inquirer'),
+    jira = require('jira'),
     logger = require(GH_PATH + 'lib/logger'),
+    openUrl = require('open'),
+    url = require('url'),
     config = base.getConfig(true),
     jiraConfig = config.plugins.jira;
 
@@ -67,11 +67,11 @@ Jira.DETAILS = {
         'm': ['--message'],
         'N': ['--new'],
         'n': ['--number'],
-        'p': ['--project'],
         'P': ['--priority'],
+        'p': ['--project'],
         'R': ['--reporter'],
-        'T': ['--type'],
         't': ['--title'],
+        'T': ['--type'],
         'u': ['--update'],
         'v': ['--version']
     },
@@ -85,14 +85,15 @@ Jira.ACTION_ISSUE_ASSIGN_TO_ME = 'ISSUE_ASSIGN_TO_ME';
 Jira.ACTION_ISSUE_OPEN_IN_BROWSER = 'ISSUE_OPEN_IN_BROWSER';
 
 Jira.getIssueNumber = function(opt_branch, opt_callback) {
-    var operations,
-        number;
+    var number,
+        operations;
 
     operations = [
         function(callback) {
             if (opt_branch) {
                 number = Jira.getIssueNumberFromText(opt_branch);
             }
+
             callback();
         },
         function(callback) {
@@ -265,14 +266,15 @@ Jira.prototype.run = function() {
                 if (options.transition === true ||
                     options.transition === 'true') {
 
-                    instance.transitionWithQuestion_(options.number, options.transition, function(err, data) {
-                        if (err || data) {
-                            logger.defaultCallback(
-                                err, null, logger.compileTemplate('{{jiraIssueLink}}', {
-                                    options: options
-                                }));
-                        }
-                    });
+                    instance.transitionWithQuestion_(
+                        options.number, options.transition, function(err, data) {
+                            if (err || data) {
+                                logger.defaultCallback(
+                                    err, null, logger.compileTemplate('{{jiraIssueLink}}', {
+                                        options: options
+                                    }));
+                            }
+                        });
                 }
                 else {
                     logger.logTemplate(
@@ -470,9 +472,9 @@ Jira.prototype.getFields_ = function(opt_callback) {
 
 Jira.prototype.getFieldByName_ = function(name, opt_callback, opt_source) {
     var instance = this,
-        operations,
+        field,
         fields,
-        field;
+        operations;
 
     operations = [
         function(callback) {
@@ -511,8 +513,8 @@ Jira.prototype.getIssue_ = function(issueNumber, opt_callback) {
 
 Jira.prototype.getIssueTypeByName_ = function(name, opt_callback) {
     var instance = this,
-        issueType,
         operations,
+        type,
         types;
 
     operations = [
@@ -525,13 +527,13 @@ Jira.prototype.getIssueTypeByName_ = function(name, opt_callback) {
             });
         },
         function(callback) {
-            issueType = instance.findFirstArrayValue_(types, 'name', name);
+            type = instance.findFirstArrayValue_(types, 'name', name);
             callback();
         }
     ];
 
     async.series(operations, function(err) {
-        opt_callback && opt_callback(err, issueType);
+        opt_callback && opt_callback(err, type);
     });
 };
 
@@ -545,10 +547,10 @@ Jira.prototype.getIssueTypes_ = function(opt_callback) {
 
 Jira.prototype.getIssueUrl_ = function(number) {
     return url.format({
-        protocol: jiraConfig.protocol,
         hostname: jiraConfig.host,
+        pathname: '/browse/' + number,
         port: jiraConfig.port,
-        pathname: '/browse/' + number
+        protocol: jiraConfig.protocol
     });
 };
 
@@ -591,15 +593,16 @@ Jira.prototype.getUpdatePayload_ = function(opt_callback) {
             });
         },
         function(callback) {
-            instance.getProjectComponentByName_(options.project, options.component, function(err, data) {
-                if (!err) {
-                    component = data;
-                }
-                if (!component) {
-                    err = 'No component found, try --component "JavaScript".';
-                }
-                callback(err);
-            });
+            instance.getProjectComponentByName_(
+                options.project, options.component, function(err, data) {
+                    if (!err) {
+                        component = data;
+                    }
+                    if (!component) {
+                        err = 'No component found, try --component "JavaScript".';
+                    }
+                    callback(err);
+                });
         },
         function(callback) {
             // Since priority is not required in many JIRA configurations, skip
@@ -899,9 +902,9 @@ Jira.prototype.searchUser_ = function(query, opt_callback) {
 
 Jira.prototype.searchUserByGithubUsername_ = function(query, opt_callback) {
     var instance = this,
+        githubUser,
         operations,
-        users,
-        userGithub;
+        users;
 
     operations = [
         function(callback) {
@@ -925,19 +928,19 @@ Jira.prototype.searchUserByGithubUsername_ = function(query, opt_callback) {
 
             base.github.search.users(payload, function(err, data) {
                 if (!err) {
-                    userGithub = data.users[0];
+                    githubUser = data.users[0];
                 }
                 callback(err);
             });
         },
         function(callback) {
             // If any user or github user was found on jira do not call github search.
-            if (users || !userGithub) {
+            if (users || !githubUser) {
                 callback();
                 return;
             }
 
-            instance.searchUser_(userGithub.name, function(err, data) {
+            instance.searchUser_(githubUser.name, function(err, data) {
                 if (!err && data.length) {
                     users = data;
                 }
@@ -974,11 +977,11 @@ Jira.prototype.selectUserWithQuestion_ = function(users, callback) {
 Jira.prototype.transition = function(number, name, opt_callback) {
     var instance = this,
         options = instance.options,
+        expandedPayload,
         issue,
         newIssue,
         operations,
         payload,
-        expandedPayload,
         transition;
 
     options.message = options.message || '';
@@ -1067,9 +1070,9 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
         options = instance.options,
         action,
         choices,
+        operations,
         response,
-        transitions,
-        operations;
+        transitions;
 
     operations = [
         function(callback) {
@@ -1123,9 +1126,10 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
             }
 
             if (action === Jira.ACTION_ISSUE_ASSIGN_TO_ME) {
-                logger.logTemplate('{{prefix}} [info] Assigning issue to {{magentaBright jira.user}}', {
-                    jira: jiraConfig
-                });
+                logger.logTemplate(
+                    '{{prefix}} [info] Assigning issue to {{magentaBright jira.user}}', {
+                        jira: jiraConfig
+                    });
 
                 options.assignee = jiraConfig.user;
 
