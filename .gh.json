@@ -3,7 +3,9 @@
     "default_issue_component": {
         "LPS": "UI"
     },
-    "default_issue_type": "Bug",
+    "default_issue_type": {
+        "LPS": "Bug"
+    },
     "default_issue_version": {
         "LPS": "6.2.X"
     },
