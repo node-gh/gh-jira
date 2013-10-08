@@ -113,7 +113,7 @@ Jira.getIssueNumber = function(opt_branch, opt_callback) {
                 return;
             }
 
-            git.getLastCommitMessage(opt_branch, function(err, data) {
+            git.getCommitMessage(opt_branch, 5, function(err, data) {
                 number = Jira.getIssueNumberFromText(data);
                 callback();
             });
