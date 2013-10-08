@@ -139,12 +139,34 @@ Jira.getIssueNumberFromText = function(text) {
 
 // Hooks -----------------------------------------------------------------------
 
-exports.setupBeforeHooks = exports.setupAfterHooks = function(context, done) {
+exports.setupAfterHooks = function(context, done) {
     var options = context.options;
 
     Jira.getIssueNumber(options.pullBranch, function(err, data) {
         context.jira = jiraConfig;
-        context.jira.number = data;
+
+        if (!context.jira.number) {
+            context.jira.number = {};
+        }
+
+        context.jira.number.current = data;
+
+        done();
+    });
+};
+
+exports.setupBeforeHooks = function(context, done) {
+    var options = context.options;
+
+    Jira.getIssueNumber(options.pullBranch, function(err, data) {
+        context.jira = jiraConfig;
+
+        if (!context.jira.number) {
+            context.jira.number = {};
+        }
+
+        context.jira.number.previous = data;
+
         done();
     });
 };
