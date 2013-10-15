@@ -431,57 +431,46 @@ Jira.prototype.expandEmoji_ = function(content) {
     return content.replace(':octocat:', '![NodeGH](http://nodegh.io/images/octocat.png)');
 };
 
-Jira.prototype.expandTransitionPayloadFromConfig_ = function(transitionName, payload, opt_callback) {
+Jira.prototype.expandTransitionFields_ = function(transitionConfig, transition, payload, opt_callback) {
     var instance = this,
-        transition = jiraConfig.transition[transitionName],
-        field,
-        fields,
-        operations;
+        operations = [];
 
-    if (transition) {
-        operations = [
-            function(callback) {
-                instance.getFields_(function(err, data) {
-                    if (!err) {
-                        fields = data;
-                    }
-                    callback(err);
-                });
-            },
-            function(callback) {
-                Object.keys(transition).forEach(function(fieldName) {
-                    var fieldValue = transition[fieldName];
+    transition.fieldsArray.forEach(function(field) {
+        var configValue = transitionConfig && transitionConfig[field.name];
 
-                    if (fieldValue) {
-                        // Get field by name using fields cache to avoid
-                        // unecesary server roundtrip.
-                        instance.getFieldByName_(fieldName, function(err, data) {
-                            if (!err) {
-                                field = data;
-                            }
-                        }, fields);
+        if (configValue !== undefined && configValue !== true) {
+            payload.fields[field.id] = configValue;
+            return;
+        }
 
-                        if (field) {
-                            payload.fields[field.id] = fieldValue;
+        if (field.required || configValue === true) {
+            operations.push(function(callback) {
+                inquirer.prompt(
+                    [
+                        {
+                            choices: field.allowedValues,
+                            message: 'Select the ' + field.name + ':',
+                            name: 'fieldName',
+                            type: 'list'
                         }
-                    }
-                });
+                    ], function(answers) {
+                        var fieldValue = instance.findFirstArrayValue_(
+                            field.allowedValues, 'name', answers.fieldName);
 
-                callback();
-            },
-            function(callback) {
-                instance.compileObjectValuesTemplate_(payload);
-                callback();
-            }
-        ];
+                        if (field.schema.type === 'array') {
+                            fieldValue = [fieldValue];
+                        }
+                        payload.fields[field.id] = fieldValue;
 
-        async.series(operations, function(err) {
-            opt_callback && opt_callback(err, payload);
-        });
-    }
-    else {
+                        callback();
+                    });
+            });
+        }
+    });
+
+    async.series(operations, function() {
         opt_callback && opt_callback(null, payload);
-    }
+    });
 };
 
 Jira.prototype.findFirstArrayValue_ = function(values, key, search) {
@@ -1023,12 +1012,12 @@ Jira.prototype.selectUserWithQuestion_ = function(users, callback) {
 Jira.prototype.transition = function(number, name, opt_callback) {
     var instance = this,
         options = instance.options,
-        expandedPayload,
         issue,
         newIssue,
         operations,
         payload,
-        transition;
+        transition,
+        transitionConfig = jiraConfig.transition[name];
 
     options.message = options.message || '';
 
@@ -1038,7 +1027,7 @@ Jira.prototype.transition = function(number, name, opt_callback) {
                 if (!err) {
                     transition = data;
                 }
-                if (!transition) {
+                else {
                     err = '"' + name + '" is not a valid transition, try another action.';
                 }
                 callback(err);
@@ -1061,20 +1050,6 @@ Jira.prototype.transition = function(number, name, opt_callback) {
                 }
             };
 
-            instance.expandTransitionPayloadFromConfig_(name, payload, function(err, data) {
-                if (!err) {
-                    expandedPayload = data;
-                }
-                callback(err);
-            });
-        },
-        function(callback) {
-            if (options.originalAssignee) {
-                payload.fields.assignee = {
-                    name: options.assignee
-                };
-            }
-
             if (options.message) {
                 options.message = instance.expandComment_(
                     logger.applyReplacements(options.message));
@@ -1088,16 +1063,17 @@ Jira.prototype.transition = function(number, name, opt_callback) {
                 ];
             }
 
-            if (options.resolution) {
-                payload.fields.resolution = {
-                    name: options.resolution
-                };
-            }
-
-            callback();
+            instance.expandTransitionFields_(transitionConfig, transition, payload, function(err, data) {
+                if (!err) {
+                    payload = data;
+                }
+                callback(err);
+            });
         },
         function(callback) {
-            instance.api.transitionIssue(issue.id, expandedPayload, function(err, data) {
+            payload = instance.compileObjectValuesTemplate_(payload);
+
+            instance.api.transitionIssue(number, payload, function(err, data) {
                 if (!err) {
                     newIssue = data;
                 }
