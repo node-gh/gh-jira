@@ -51,7 +51,6 @@ Jira.DETAILS = {
         'priority': String,
         'project': String,
         'reporter': String,
-        'resolution': String,
         'submittedLink': String,
         'title': String,
         'transition': String,
