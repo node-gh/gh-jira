@@ -60,11 +60,6 @@
             },
             "Git Pull Request": "{{options.submittedLink}}"
         },
-        "Open Issue": {
-            "Assignee": {
-                "name": "{{options.assignee}}"
-            }
-        },
         "Reassign Review Request": {
             "Assignee": {
                 "name": "{{options.assignee}}"
