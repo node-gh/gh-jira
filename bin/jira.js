@@ -372,21 +372,16 @@ Jira.prototype.comment = function(opt_callback) {
 
 Jira.prototype.compileObjectValuesTemplate_ = function(o) {
     var instance = this,
-        options = instance.options;
+        options = instance.options,
+        value;
 
-    Object.keys(o).forEach(function(key) {
-        var value = o[key];
-
-        if (typeof value === 'object') {
-            instance.compileObjectValuesTemplate_(value);
-        }
-        else {
-            o[key] = logger.compileTemplate(value, {
-                jira: jiraConfig,
-                options: options
-            });
-        }
+    value = JSON.stringify(o);
+    value = logger.compileTemplate(value, {
+        jira: jiraConfig,
+        options: options
     });
+
+    return JSON.parse(value);
 };
 
 Jira.prototype.deleteObjectEmptyValues_ = function(o) {
