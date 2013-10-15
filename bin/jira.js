@@ -722,8 +722,8 @@ Jira.prototype.getUpdatePayload_ = function(opt_callback) {
 Jira.prototype.getPriorities_ = function(opt_callback) {
     var instance = this;
 
-    instance.api.listPriorities(function(err, components) {
-        opt_callback && opt_callback(err, components);
+    instance.api.listPriorities(function(err, priorities) {
+        opt_callback && opt_callback(err, priorities);
     });
 };
 
