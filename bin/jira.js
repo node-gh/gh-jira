@@ -336,6 +336,22 @@ Jira.prototype.run = function() {
     });
 };
 
+Jira.prototype.addTransitionFieldsArray_ = function(transition) {
+    var fields,
+        fieldsArray;
+
+    if (transition) {
+        fields = transition.fields;
+
+        fieldsArray = [];
+        Object.keys(fields).forEach(function(fieldId) {
+            fields[fieldId].id = fieldId;
+            fieldsArray.push(fields[fieldId]);
+        });
+        transition.fieldsArray = fieldsArray;
+    }
+};
+
 Jira.prototype.browser = function(number) {
     var instance = this;
 
@@ -816,6 +832,10 @@ Jira.prototype.getTransitionByName_ = function(number, name, opt_callback) {
         },
         function(callback) {
             transition = instance.findFirstArrayValue_(transitions, 'name', name);
+            callback();
+        },
+        function(callback) {
+            instance.addTransitionFieldsArray_(transition);
             callback();
         }
     ];
