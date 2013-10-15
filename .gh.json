@@ -52,9 +52,7 @@
     "protocol": "https",
     "transition": {
         "Close Issue": {
-            "Fix Version/s": {
-                "name": "{{options.version}}"
-            }
+            "Fix Version/s": true
         },
         "Create Review Request": {
             "Assignee": {
