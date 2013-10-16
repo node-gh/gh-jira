@@ -26,21 +26,18 @@
             "fwd": {
                 "before": [],
                 "after": [
-                    "{{#if options.changes}}{{#if jira.number.current}} gh jira {{jira.number.current}} --comment 'Pull request forwarded to {{forwardedLink}}. [See changes here.]({{compareLink}})' {{/if}}{{/if}}",
                     { "cmd": "gh", "args": ["jira", "{{jira.number.current}}", "--assignee", "{{options.fwd}}", "--submittedLink", "{{forwardedLink}}"] }
                 ]
             },
             "merge": {
                 "before": [],
                 "after": [
-                    "{{#if options.changes}}{{#if jira.number.previous}} gh jira {{jira.number.previous}} --comment 'Thank you, pull request merged! [See changes here.]({{compareLink}})' {{/if}}{{/if}}",
                     { "cmd": "gh", "args": ["jira", "{{jira.number.previous}}"] }
                 ]
             },
             "submit": {
                 "before": [],
                 "after": [
-                    "{{#if options.changes}}{{#if jira.number.previous}} gh jira {{jira.number.previous}} --comment 'Pull request submitted to {{submittedLink}}. [See changes here.]({{compareLink}})' {{/if}}{{/if}}",
                     { "cmd": "gh", "args": ["jira", "{{jira.number.previous}}", "--assignee", "{{options.submit}}", "--submittedLink", "{{submittedLink}}"] }
                 ]
             }
