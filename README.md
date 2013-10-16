@@ -97,7 +97,6 @@ Option             | Usage        | Type
 `-n`, `--number`   | **Required** | `Number`
 `-A`, `--assignee` | *Optional*   | `String`
 `-m`, `--message`  | *Optional*   | `String`
-`--resolution`     | *Optional*   | `String`
 
 Omitting `--number` will guess issue number from the last commit message.
 
