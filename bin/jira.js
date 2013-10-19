@@ -85,6 +85,7 @@ Jira.ACTION_ISSUE_OPEN_IN_BROWSER = 'ISSUE_OPEN_IN_BROWSER';
 
 Jira.getIssueNumber = function(opt_branch, opt_callback) {
     var number,
+        project,
         operations;
 
     operations = [
@@ -107,12 +108,22 @@ Jira.getIssueNumber = function(opt_branch, opt_callback) {
             });
         },
         function(callback) {
+            // Use the last five commit messages to infer the project name.
+            git.getCommitMessage(opt_branch, 5, function(err, data) {
+                project = Jira.getProjectName(Jira.getIssueNumberFromText(data));
+                callback();
+            });
+        },
+        function(callback) {
             if (number) {
                 callback();
                 return;
             }
 
-            git.getCommitMessage(opt_branch, 5, function(err, data) {
+            // Use only the first commit message to infer the issue number. Use
+            // more than one message, can, potentially, guess a wrong issue
+            // number.
+            git.getCommitMessage(opt_branch, 1, function(err, data) {
                 number = Jira.getIssueNumberFromText(data);
                 callback();
             });
@@ -120,7 +131,7 @@ Jira.getIssueNumber = function(opt_branch, opt_callback) {
     ];
 
     async.series(operations, function(err) {
-        opt_callback && opt_callback(err, number);
+        opt_callback && opt_callback(err, number, project);
     });
 };
 
@@ -136,19 +147,26 @@ Jira.getIssueNumberFromText = function(text) {
     }
 };
 
+Jira.getProjectName = function(number) {
+    if (number) {
+        return number.substring(0, number.indexOf('-'));
+    }
+};
+
+
 // Hooks -----------------------------------------------------------------------
 
 exports.setupAfterHooks = function(context, done) {
     var options = context.options;
 
-    Jira.getIssueNumber(options.pullBranch, function(err, data) {
+    Jira.getIssueNumber(options.pullBranch, function(err, number) {
         context.jira = jiraConfig;
 
         if (!context.jira.number) {
             context.jira.number = {};
         }
 
-        context.jira.number.current = data;
+        context.jira.number.current = number;
 
         done();
     });
@@ -157,14 +175,14 @@ exports.setupAfterHooks = function(context, done) {
 exports.setupBeforeHooks = function(context, done) {
     var options = context.options;
 
-    Jira.getIssueNumber(options.pullBranch, function(err, data) {
+    Jira.getIssueNumber(options.pullBranch, function(err, number) {
         context.jira = jiraConfig;
 
         if (!context.jira.number) {
             context.jira.number = {};
         }
 
-        context.jira.number.previous = data;
+        context.jira.number.previous = number;
 
         done();
     });
@@ -205,18 +223,13 @@ Jira.prototype.run = function() {
             callback();
         },
         function(callback) {
-            if (options.number) {
+            Jira.getIssueNumber(null, function(err, number, project) {
+                options.number = options.number || number;
+                options.project = options.project || project;
                 callback();
-            }
-            else {
-                Jira.getIssueNumber(null, function(err, data) {
-                    options.number = data;
-                    callback();
-                });
-            }
+            });
         },
         function(callback) {
-            options.project = options.project || instance.getProjectName_(options.number);
             options.component = options.component || jiraConfig.default_issue_component[options.project];
             options.type = options.type || jiraConfig.default_issue_type[options.project];
             options.version = options.version || jiraConfig.default_issue_version[options.project];
@@ -577,12 +590,6 @@ Jira.prototype.getIssueUrl_ = function(number) {
         port: jiraConfig.port,
         protocol: jiraConfig.protocol
     });
-};
-
-Jira.prototype.getProjectName_ = function(number) {
-    if (number) {
-        return number.substring(0, number.indexOf('-'));
-    }
 };
 
 Jira.prototype.getUpdatePayload_ = function(opt_callback) {
