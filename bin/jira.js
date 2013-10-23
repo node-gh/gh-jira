@@ -247,6 +247,11 @@ Jira.prototype.run = function() {
                     return;
                 }
 
+                if (!users) {
+                    callback('Not found any user for ' + options.assignee);
+                    return;
+                }
+
                 if (users.length > 1) {
                     instance.selectUserWithQuestion_(users, function(username) {
                         options.assignee = username;
