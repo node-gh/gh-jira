@@ -37,7 +37,8 @@ Jira.DETAILS = {
         'browser',
         'comment',
         'new',
-        'transition'
+        'transition',
+        'update'
     ],
     description: 'NodeGH plugin for integrating Jira, an issue management system.',
     options: {
