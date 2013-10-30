@@ -331,9 +331,7 @@ Jira.prototype.run = function() {
 
         if (options.transition) {
             if (options.number) {
-                if (options.transition === true ||
-                    options.transition === 'true') {
-
+                if (String(options.transition) === 'true') {
                     instance.transitionWithQuestion_(
                         options.number, options.transition, function(err, data) {
                             if (err || data) {
