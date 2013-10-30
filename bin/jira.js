@@ -91,41 +91,53 @@ Jira.getIssueNumber = function(opt_branch, opt_callback) {
 
     operations = [
         function(callback) {
+            // First, try to extract the issue number from the optional branch
+            // name.
             if (opt_branch) {
                 number = Jira.getIssueNumberFromText(opt_branch);
             }
 
+            if (number) {
+                callback();
+            }
+            else {
+                // If number was not found, try to extract from the current
+                // branch name.
+                git.getCurrentBranch(function(err, data) {
+                    number = Jira.getIssueNumberFromText(data);
+                    callback();
+                });
+            }
+        },
+        function(callback) {
+            if (number) {
+                callback();
+                return;
+            }
+
+            // If number was not found yet, use only the first commit message to
+            // infer the issue number. Use more than one message, can,
+            // potentially, guess a wrong issue number.
+            git.getCommitMessage(opt_branch, 1, function(err, data) {
+                number = Jira.getIssueNumberFromText(data);
+                callback();
+            });
+        },
+        function(callback) {
+            // Try to extract the project name from the found number.
+            if (number) {
+                project = Jira.getProjectName(number);
+            }
             callback();
         },
         function(callback) {
-            if (number) {
+            if (project) {
                 callback();
                 return;
             }
-
-            git.getCurrentBranch(function(err, data) {
-                number = Jira.getIssueNumberFromText(data);
-                callback();
-            });
-        },
-        function(callback) {
-            // Use the last five commit messages to infer the project name.
+            // If project was not found yet, use the last five commit messagesto infer the project name.
             git.getCommitMessage(opt_branch, 5, function(err, data) {
                 project = Jira.getProjectName(Jira.getIssueNumberFromText(data));
-                callback();
-            });
-        },
-        function(callback) {
-            if (number) {
-                callback();
-                return;
-            }
-
-            // Use only the first commit message to infer the issue number. Use
-            // more than one message, can, potentially, guess a wrong issue
-            // number.
-            git.getCommitMessage(opt_branch, 1, function(err, data) {
-                number = Jira.getIssueNumberFromText(data);
                 callback();
             });
         }
@@ -289,21 +301,26 @@ Jira.prototype.run = function() {
         }
 
         if (options.new) {
-            logger.logTemplate(
-                '{{prefix}} [info] Creating a new issue on project {{greenBright options.project}}', {
-                    options: options
-                });
-
-            instance.new(function(err, issue) {
-                if (issue) {
-                    options.number = issue.key;
-                }
-
-                logger.defaultCallback(
-                    err, null, logger.compileTemplate('{{jiraIssueLink}}', {
+            if (options.project) {
+                logger.logTemplate(
+                    '{{prefix}} [info] Creating a new issue on project {{greenBright options.project}}', {
                         options: options
-                    }));
-            });
+                    });
+
+                instance.new(function(err, issue) {
+                    if (issue) {
+                        options.number = issue.key;
+                    }
+
+                    logger.defaultCallback(
+                        err, null, logger.compileTemplate('{{jiraIssueLink}}', {
+                            options: options
+                        }));
+                });
+            }
+            else {
+                logger.warn('Project name not found, try with --project.');
+            }
         }
 
         if (options.transition) {
@@ -341,17 +358,22 @@ Jira.prototype.run = function() {
         }
 
         if (options.update) {
-            logger.logTemplate(
-                '{{prefix}} [info] Updating issue {{cyan options.number}}', {
-                    options: options
-                });
-
-            instance.update(options.number, function(err) {
-                logger.defaultCallback(
-                    err, null, logger.compileTemplate('{{jiraIssueLink}}', {
+            if (options.project) {
+                logger.logTemplate(
+                    '{{prefix}} [info] Updating issue {{cyan options.number}}', {
                         options: options
-                    }));
-            });
+                    });
+
+                instance.update(options.number, function(err) {
+                    logger.defaultCallback(
+                        err, null, logger.compileTemplate('{{jiraIssueLink}}', {
+                            options: options
+                        }));
+                });
+            }
+            else {
+                logger.warn('Project name not found, try --project JIR.');
+            }
         }
     });
 };
@@ -625,7 +647,7 @@ Jira.prototype.getUpdatePayload_ = function(opt_callback) {
                     issueType = data;
                 }
                 if (!issueType) {
-                    err = 'No issue found, try --type "Bug".';
+                    err = 'No issue type found, try --type "Bug".';
                 }
                 callback(err);
             });
