@@ -1165,6 +1165,7 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
         options = instance.options,
         action,
         choices,
+        issue,
         operations,
         response,
         transitions;
@@ -1174,6 +1175,14 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
             instance.api.listTransitions(number, function(err, data) {
                 if (!err) {
                     transitions = data;
+                }
+                callback(err);
+            });
+        },
+        function(callback) {
+            instance.getIssue_(options.number, function(err, data) {
+                if (!err) {
+                    issue = data;
                 }
                 callback(err);
             });
@@ -1193,7 +1202,7 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
                 [
                     {
                         choices: choices,
-                        message: 'What do you want to do with ' + logger.clc.greenBright(options.number) + '?',
+                        message: 'What do you want to do with ' + logger.clc.greenBright(issue.key + ' ' + issue.fields.summary) + '?',
                         name: 'transition',
                         type: 'list'
                     }
