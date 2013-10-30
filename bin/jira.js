@@ -77,7 +77,7 @@ Jira.DETAILS = {
         'v': ['--version']
     },
     payload: function(payload, options) {
-        options.transition = true;
+        options.transition = payload[1] || true;
     }
 };
 
@@ -1097,7 +1097,7 @@ Jira.prototype.transition = function(number, name, opt_callback) {
     operations = [
         function(callback) {
             instance.getTransitionByName_(number, name, function(err, data) {
-                if (!err) {
+                if (!err && data) {
                     transition = data;
                 }
                 else {
