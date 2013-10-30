@@ -227,10 +227,6 @@ Jira.prototype.run = function() {
             Jira.getIssueNumber(null, function(err, number, project) {
                 options.number = options.number || number;
                 options.project = options.project || project;
-
-                if (!options.number) {
-                    err = 'Issue number not found.';
-                }
                 callback(err);
             });
         },
@@ -241,7 +237,9 @@ Jira.prototype.run = function() {
             callback();
         },
         function(callback) {
-            if (!options.originalAssignee) {
+            // If the assignee was not specified on the command options or there
+            // is no issue number no need for search the user.
+            if (!options.originalAssignee || !options.number) {
                 callback();
                 return;
             }
