@@ -14,6 +14,7 @@ var GH_PATH = process.env.GH_PATH;
 // -- Requires -----------------------------------------------------------------
 var async = require('async'),
     base = require(GH_PATH + 'lib/base'),
+    crypto = require('crypto'),
     git = require(GH_PATH + 'lib/git'),
     inquirer = require('inquirer'),
     jira = require('jira'),
@@ -83,6 +84,10 @@ Jira.DETAILS = {
 Jira.ACTION_ISSUE_ASSIGN_TO_ME = 'ISSUE_ASSIGN_TO_ME';
 
 Jira.ACTION_ISSUE_OPEN_IN_BROWSER = 'ISSUE_OPEN_IN_BROWSER';
+
+Jira.CRYPTO_ALGORITHM = 'AES-256-CBC';
+
+Jira.CRYPTO_PASSWORD = 'nodegh.io';
 
 Jira.getIssueNumber = function(opt_branch, opt_callback) {
     var number,
@@ -231,7 +236,8 @@ Jira.prototype.run = function() {
         function(callback) {
             instance.api = new jira.JiraApi(
                 jiraConfig.protocol, jiraConfig.host, jiraConfig.port,
-                jiraConfig.user, jiraConfig.password, jiraConfig.api_version);
+                jiraConfig.user, instance.decryptText_(jiraConfig.password),
+                jiraConfig.api_version);
 
             callback();
         },
@@ -442,6 +448,20 @@ Jira.prototype.compileObjectValuesTemplate_ = function(o) {
     return JSON.parse(value);
 };
 
+Jira.prototype.decryptText_ = function(text) {
+    var decipher,
+        decrypted;
+
+        decipher = crypto.createDecipher(
+            Jira.CRYPTO_ALGORITHM, Jira.CRYPTO_PASSWORD);
+
+        decrypted = decipher.update(text, 'hex', 'utf8');
+
+    decrypted += decipher.final('utf8');
+
+    return decrypted;
+};
+
 Jira.prototype.deleteObjectEmptyValues_ = function(o) {
     var instance = this;
 
@@ -455,6 +475,20 @@ Jira.prototype.deleteObjectEmptyValues_ = function(o) {
             delete o[key];
         }
     });
+};
+
+Jira.prototype.encryptText_ = function(text) {
+    var cipher,
+        crypted;
+
+        cipher = crypto.createCipher(
+            Jira.CRYPTO_ALGORITHM, Jira.CRYPTO_PASSWORD);
+
+        crypted = cipher.update(text, 'utf8', 'hex');
+
+    crypted += cipher.final('hex');
+
+    return crypted;
 };
 
 Jira.prototype.expandAliases_ = function(options) {
@@ -905,6 +939,8 @@ Jira.prototype.getVersions_ = function(project, opt_callback) {
 };
 
 Jira.prototype.login_ = function(opt_callback) {
+    var instance = this;
+
     inquirer.prompt(
         [
             {
@@ -918,6 +954,8 @@ Jira.prototype.login_ = function(opt_callback) {
                 name: 'password'
             }
         ], function(answers) {
+            answers.password = instance.encryptText_(answers.password);
+
             jiraConfig.user = answers.user;
             jiraConfig.password = answers.password;
 
