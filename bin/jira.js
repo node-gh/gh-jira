@@ -224,6 +224,17 @@ Jira.prototype.run = function() {
 
     operations = [
         function(callback) {
+            // Some users may have unencrypted passwords, forces login to store
+            // it encrypted.
+            try {
+                jiraConfig.password = instance.decryptText_(jiraConfig.password);
+            }
+            catch(e) {
+                jiraConfig.password = null;
+            }
+            callback();
+        },
+        function(callback) {
             if (jiraConfig.user && jiraConfig.password) {
                 callback();
             }
@@ -236,8 +247,7 @@ Jira.prototype.run = function() {
         function(callback) {
             instance.api = new jira.JiraApi(
                 jiraConfig.protocol, jiraConfig.host, jiraConfig.port,
-                jiraConfig.user, instance.decryptText_(jiraConfig.password),
-                jiraConfig.api_version);
+                jiraConfig.user, jiraConfig.password, jiraConfig.api_version);
 
             callback();
         },
