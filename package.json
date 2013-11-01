@@ -38,7 +38,7 @@
         "mocha": "~1.12.0"
     },
     "engines": {
-        "node": ">=0.8 <=0.10"
+        "node": ">=0.8 <0.12"
     },
     "peerDependencies": {
         "gh": ">=1.8.0"
