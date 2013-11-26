@@ -21,7 +21,7 @@ var async = require('async'),
     logger = require(GH_PATH + 'lib/logger'),
     openUrl = require('open'),
     url = require('url'),
-    config = base.getConfig(true),
+    config = base.getGlobalConfig(),
     jiraConfig = config.plugins.jira;
 
 // -- Constructor --------------------------------------------------------------
