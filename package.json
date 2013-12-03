@@ -30,7 +30,7 @@
     "dependencies": {
         "async": "~0.2.9",
         "inquirer": "~0.3.4",
-        "jira": "git://github.com/eduardolundgren/node-jira.git#master",
+        "jira": "~0.8.2",
         "open": "~0.0.4"
     },
     "devDependencies": {
