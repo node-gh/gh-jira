@@ -51,13 +51,7 @@
         "Close Issue": {
             "Fix Version/s": true
         },
-        "Create Review Request": {
-            "Assignee": {
-                "name": "{{options.assignee}}"
-            },
-            "Git Pull Request": "{{options.submittedLink}}"
-        },
-        "Reassign Review Request": {
+        "Code Review Request": {
             "Assignee": {
                 "name": "{{options.assignee}}"
             },
