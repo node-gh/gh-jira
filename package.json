@@ -41,7 +41,7 @@
         "node": ">=0.8 <0.12"
     },
     "peerDependencies": {
-        "gh": ">=1.8.0"
+        "gh": ">=1.9"
     },
     "preferGlobal": "true"
 }
