@@ -40,19 +40,19 @@ Option             | Usage        | Type
 * Create a new issue on a certain project.
 
     ```
-gh jira --new --title 'Node GH rocks!' --message 'Body with **Markdown** support' --project LPS
+gh jira --new --project LPS --title 'Node GH rocks!' --message 'Body with **Markdown** support'
     ```
 
 * Create a new issue specifying the component.
 
     ```
-gh jira --new --title 'Node GH rocks!' --component UI
+gh jira --new --project LPS --title 'Node GH rocks!' --component UI
     ```
 
 * Create a new issue and assign it to someone.
 
     ```
-gh jira --new --title 'Node GH rocks!' --assignee eduardolundgren
+gh jira --new --project LPS --title 'Node GH rocks!' --assignee eduardolundgren
     ```
 
 ### 2. Comment
