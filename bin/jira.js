@@ -81,7 +81,7 @@ Jira.DETAILS = {
     }
 };
 
-Jira.ACTION_ISSUE_ASSIGN_TO_ME = 'ISSUE_ASSIGN_TO_ME';
+Jira.ACTION_ISSUE_ASSIGN = 'ISSUE_ASSIGN';
 
 Jira.ACTION_ISSUE_OPEN_IN_BROWSER = 'ISSUE_OPEN_IN_BROWSER';
 
@@ -1219,10 +1219,16 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
                 ], function(answers) {
                     switch (answers.transition) {
                         case 'Assign to me':
-                            action = Jira.ACTION_ISSUE_ASSIGN_TO_ME;
+                            action = Jira.ACTION_ISSUE_ASSIGN;
+                            options.assignee = jiraConfig.user;
                             break;
                         case 'Open in browser':
                             action = Jira.ACTION_ISSUE_OPEN_IN_BROWSER;
+                            break;
+                        case 'Nothing, thanks':
+                            if (options.assignee) {
+                                action = Jira.ACTION_ISSUE_ASSIGN;
+                            }
                             break;
                         default:
                             action = instance.findFirstArrayValue_(
@@ -1239,13 +1245,11 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
                 return;
             }
 
-            if (action === Jira.ACTION_ISSUE_ASSIGN_TO_ME) {
+            if (action === Jira.ACTION_ISSUE_ASSIGN) {
                 logger.logTemplate(
-                    '{{prefix}} [info] Assigning issue to {{magentaBright jira.user}}', {
-                        jira: jiraConfig
+                    '{{prefix}} [info] Assigning issue to {{magentaBright options.assignee}}', {
+                        options: options
                     });
-
-                options.assignee = jiraConfig.user;
 
                 instance.update(options.number, function(err, issue) {
                     response = issue;
