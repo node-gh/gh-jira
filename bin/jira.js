@@ -1147,6 +1147,12 @@ Jira.prototype.transition = function(number, name, opt_callback) {
                 ];
             }
 
+            if (options.assignee) {
+                payload.fields.assignee = {
+                    name: options.assignee
+                };
+            }
+
             instance.expandTransitionFields_(transitionConfig, transition, payload, function(err, data) {
                 if (!err) {
                     payload = data;
