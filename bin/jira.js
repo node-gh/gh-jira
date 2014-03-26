@@ -1041,13 +1041,14 @@ Jira.prototype.searchUserByGithubUsername_ = function(query, opt_callback) {
             }
 
             var payload = {
-                keyword: query
+                user: query
             };
 
-            base.github.search.users(payload, function(err, data) {
+            base.github.user.getFrom(payload, function(err, data) {
                 if (!err) {
-                    githubUser = data.users[0];
+                    githubUser = data;
                 }
+
                 callback(err);
             });
         },
