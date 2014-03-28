@@ -372,22 +372,17 @@ Jira.prototype.run = function() {
         }
 
         if (options.update) {
-            if (options.project) {
-                logger.logTemplate(
-                    '{{prefix}} [info] Updating issue {{cyan options.number}}', {
-                        options: options
-                    });
-
-                instance.update(options.number, function(err) {
-                    logger.defaultCallback(
-                        err, null, logger.compileTemplate('{{jiraIssueLink}}', {
-                            options: options
-                        }));
+            logger.logTemplate(
+                '{{prefix}} [info] Updating issue {{cyan options.number}}', {
+                    options: options
                 });
-            }
-            else {
-                logger.warn('Project name not found, try --project JIR.');
-            }
+
+            instance.update(options.number, function(err) {
+                logger.defaultCallback(
+                    err, null, logger.compileTemplate('{{jiraIssueLink}}', {
+                        options: options
+                    }));
+            });
         }
     });
 };
