@@ -140,7 +140,7 @@ Jira.getIssueNumber = function(opt_branch, opt_callback) {
                 callback();
                 return;
             }
-            // If project was not found yet, use the last five commit messagesto infer the project name.
+            // If project was not found yet, use the last five commit messages to infer the project name.
             git.getCommitMessage(opt_branch, 5, function(err, data) {
                 project = Jira.getProjectName(Jira.getIssueNumberFromText(data));
                 callback();
@@ -695,12 +695,17 @@ Jira.prototype.getUpdatePayload_ = function(opt_callback) {
             });
         },
         function(callback) {
-            instance.getProject_(options.project, function(err, data) {
-                if (!err) {
-                    project = data;
-                }
-                callback(err);
-            });
+            if (!options.new && !options.project) {
+                callback();
+            }
+            else {
+                instance.getProject_(options.project, function(err, data) {
+                    if (!err) {
+                        project = data;
+                    }
+                    callback(err);
+                });
+            }
         },
         function(callback) {
             instance.getProjectComponentByName_(
