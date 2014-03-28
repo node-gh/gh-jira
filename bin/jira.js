@@ -202,7 +202,6 @@ Jira.prototype.run = function() {
 
     options.originalAssignee = options.assignee;
     options.assignee = options.assignee || jiraConfig.user;
-    options.reporter = options.reporter || jiraConfig.user;
 
     operations = [
         function(callback) {
@@ -501,6 +500,9 @@ Jira.prototype.encryptText_ = function(text) {
 Jira.prototype.expandAliases_ = function(options) {
     if (config.alias) {
         options.assignee = config.alias[options.assignee] || options.assignee;
+    }
+
+    if (options.new && config.alias) {
         options.reporter = config.alias[options.reporter] || options.reporter;
     }
 };
@@ -772,9 +774,6 @@ Jira.prototype.getUpdatePayload_ = function(opt_callback) {
                     project: {
                         id: project.id
                     },
-                    reporter: {
-                        name: options.reporter
-                    },
                     summary: options.title
                 }
             };
@@ -791,6 +790,12 @@ Jira.prototype.getUpdatePayload_ = function(opt_callback) {
                         id: version.id
                     }
                 ];
+            }
+
+            if (options.reporter && (!options.new || options.reporter !== jiraConfig.user)) {
+                payload.fields.reporter = {
+                    name: options.reporter
+                };
             }
 
             callback();
