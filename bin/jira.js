@@ -695,12 +695,17 @@ Jira.prototype.getUpdatePayload_ = function(opt_callback) {
             });
         },
         function(callback) {
-            instance.getProject_(options.project, function(err, data) {
-                if (!err) {
-                    project = data;
-                }
-                callback(err);
-            });
+            if (!options.new && !options.project) {
+                callback();
+            }
+            else {
+                instance.getProject_(options.project, function(err, data) {
+                    if (!err) {
+                        project = data;
+                    }
+                    callback(err);
+                });
+            }
         },
         function(callback) {
             instance.getProjectComponentByName_(
