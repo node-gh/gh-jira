@@ -1,6 +1,6 @@
 # GH Jira [![Build Status](https://secure.travis-ci.org/node-gh/gh-jira.svg?branch=master)](https://travis-ci.org/node-gh/gh-jira) [![NPM version](https://badge.fury.io/js/gh-jira.svg)](http://badge.fury.io/js/gh-jira) [![Dependency Status](https://david-dm.org/node-gh/gh-jira.svg?theme=badge.io)](https://david-dm.org/node-gh/gh-jira)
 
-![Inspectocat](http://zno.io/RNPr/inspectocat.png)
+![Inspectocat](https://cloud.githubusercontent.com/assets/398893/3528241/5cca20fc-078d-11e4-80fc-a68f2c8f205e.png)
 
 NodeGH plugin for integrating [Jira](https://www.atlassian.com/software/jira), an issue management system.
 
