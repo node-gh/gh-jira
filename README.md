@@ -1,4 +1,10 @@
-# GH Jira [![Build Status](https://secure.travis-ci.org/node-gh/gh-jira.svg?branch=master)](https://travis-ci.org/node-gh/gh-jira) [![NPM version](https://badge.fury.io/js/gh-jira.svg)](http://badge.fury.io/js/gh-jira) [![Dependency Status](https://david-dm.org/node-gh/gh-jira.svg?theme=badge.io)](https://david-dm.org/node-gh/gh-jira)
+# GH Jira
+
+[![NPM version](http://img.shields.io/npm/v/gh-jira.svg?style=flat)](http://npmjs.org/gh-jira)
+[![NPM downloads](http://img.shields.io/npm/dm/gh-jira.svg?style=flat)](http://npmjs.org/gh-jira)
+[![Build Status](http://img.shields.io/travis/node-gh/gh-jira/master.svg?style=flat)](https://travis-ci.org/node-gh/gh-jira)
+[![Dependencies Status](http://img.shields.io/david/node-gh/gh-jira.svg?style=flat)](https://david-dm.org/node-gh/gh-jira)
+[![DevDependencies Status](http://img.shields.io/david/dev/node-gh/gh-jira.svg?style=flat)](https://david-dm.org/node-gh/gh-jira#info=devDependencies)
 
 ![Inspectocat](https://cloud.githubusercontent.com/assets/398893/3528241/5cca20fc-078d-11e4-80fc-a68f2c8f205e.png)
 
