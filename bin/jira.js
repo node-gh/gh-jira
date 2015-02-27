@@ -246,6 +246,12 @@ Jira.prototype.run = function() {
             }
         },
         function(callback) {
+            if (!jiraConfig.host) {
+                logger.error('Jira plugin not configured.');
+                callback();
+                return;
+            }
+
             instance.api = new jira.JiraApi(
                 jiraConfig.protocol, jiraConfig.host, jiraConfig.port,
                 jiraConfig.user, jiraConfig.password, jiraConfig.api_version);
@@ -299,6 +305,10 @@ Jira.prototype.run = function() {
     ];
 
     async.series(operations, function() {
+        if (!jiraConfig.host) {
+            return;
+        }
+
         if (options.browser) {
             instance.browser(options.number);
         }
