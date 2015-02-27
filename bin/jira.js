@@ -241,7 +241,8 @@ Jira.prototype.run = function() {
             }
             else {
                 instance.login_(function() {
-                    logger.success('Writing GH config data: ' + base.getUserHomePath());
+                    logger.success('Writing GH config data.');
+                    callback();
                 });
             }
         },
