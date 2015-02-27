@@ -230,6 +230,7 @@ Jira.prototype.run = function() {
                 jiraConfig.password = instance.decryptText_(jiraConfig.password);
             }
             catch(e) {
+                logger.warn('Can\'t hash jira password.');
                 jiraConfig.password = null;
             }
             callback();
