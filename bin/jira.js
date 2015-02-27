@@ -89,68 +89,39 @@ Jira.CRYPTO_ALGORITHM = 'AES-256-CBC';
 
 Jira.CRYPTO_PASSWORD = 'nodegh.io';
 
-Jira.getIssueNumber = function(opt_branch, opt_callback) {
-    var number,
-        project,
-        operations;
+Jira.setIssueNumber = function(branch, repo, options) {
+    if (!repo) {
+        return;
+    }
 
-    operations = [
-        function(callback) {
-            // First, try to extract the issue number from the optional branch
-            // name.
-            if (opt_branch) {
-                number = Jira.getIssueNumberFromText(opt_branch);
-            }
+    // First, try to extract the issue number from the optional branch
+    // name.
+    if (branch) {
+        options.number = Jira.getIssueNumberFromText(branch);
+    }
 
-            if (number) {
-                callback();
-            }
-            else {
-                // If number was not found, try to extract from the current
-                // branch name.
-                git.getCurrentBranch(function(err, data) {
-                    number = Jira.getIssueNumberFromText(data);
-                    callback();
-                });
-            }
-        },
-        function(callback) {
-            if (number) {
-                callback();
-                return;
-            }
+    // If number was not found, try to extract from the current
+    // branch name.
+    if (!options.number) {
+        options.number = Jira.getIssueNumberFromText(git.getCurrentBranch());
+    }
 
-            // If number was not found yet, use only the first commit message to
-            // infer the issue number. Use more than one message, can,
-            // potentially, guess a wrong issue number.
-            git.getCommitMessage(opt_branch, 1, function(err, data) {
-                number = Jira.getIssueNumberFromText(data);
-                callback();
-            });
-        },
-        function(callback) {
-            // Try to extract the project name from the found number.
-            if (number) {
-                project = Jira.getProjectName(number);
-            }
-            callback();
-        },
-        function(callback) {
-            if (project) {
-                callback();
-                return;
-            }
-            // If project was not found yet, use the last five commit messages to infer the project name.
-            git.getCommitMessage(opt_branch, 5, function(err, data) {
-                project = Jira.getProjectName(Jira.getIssueNumberFromText(data));
-                callback();
-            });
-        }
-    ];
+    // If number was not found yet, use only the first commit message to
+    // infer the issue number. Use of more than one message can,
+    // potentially, find a wrong issue number.
+    if (!options.number) {
+        options.number = Jira.getIssueNumberFromText(git.getCommitMessage(branch, 1));
+    }
 
-    async.series(operations, function(err) {
-        opt_callback && opt_callback(err, number, project);
-    });
+    // Try to extract the project name from the found number.
+    if (options.number) {
+        options.project = Jira.getProjectName(options.number);
+    }
+
+    // If project was not found yet, use the last five commit messages to infer the project name.
+    if (!options.project) {
+        options.project = Jira.getProjectName(Jira.getIssueNumberFromText(git.getCommitMessage(branch, 5)));
+    }
 };
 
 Jira.getIssueNumberFromText = function(text) {
@@ -177,33 +148,33 @@ Jira.getProjectName = function(number) {
 exports.setupAfterHooks = function(context, done) {
     var options = context.options;
 
-    Jira.getIssueNumber(options.pullBranch, function(err, number) {
-        context.jira = jiraConfig;
+    Jira.setIssueNumber(options.pullBranch, options.repo, options);
 
-        if (!context.jira.number) {
-            context.jira.number = {};
-        }
+    context.jira = jiraConfig;
 
-        context.jira.number.current = number;
+    if (!context.jira.number) {
+        context.jira.number = {};
+    }
 
-        done();
-    });
+    context.jira.number.current = options.number;
+
+    done();
 };
 
 exports.setupBeforeHooks = function(context, done) {
     var options = context.options;
 
-    Jira.getIssueNumber(options.pullBranch, function(err, number) {
-        context.jira = jiraConfig;
+    Jira.setIssueNumber(options.pullBranch, options.repo, options);
 
-        if (!context.jira.number) {
-            context.jira.number = {};
-        }
+    context.jira = jiraConfig;
 
-        context.jira.number.previous = number;
+    if (!context.jira.number) {
+        context.jira.number = {};
+    }
 
-        done();
-    });
+    context.jira.number.previous = options.number;
+
+    done();
 };
 
 // -- Commands -----------------------------------------------------------------
@@ -233,9 +204,7 @@ Jira.prototype.run = function() {
                 logger.warn('Can\'t hash jira password.');
                 jiraConfig.password = null;
             }
-            callback();
-        },
-        function(callback) {
+
             if (jiraConfig.user && jiraConfig.password) {
                 callback();
             }
@@ -257,22 +226,11 @@ Jira.prototype.run = function() {
                 jiraConfig.protocol, jiraConfig.host, jiraConfig.port,
                 jiraConfig.user, jiraConfig.password, jiraConfig.api_version);
 
-            callback();
-        },
-        function(callback) {
-            Jira.getIssueNumber(null, function(err, number, project) {
-                options.number = options.number || number;
-                options.project = options.project || project;
-                callback(err);
-            });
-        },
-        function(callback) {
+            Jira.setIssueNumber(null, options.repo, options);
             options.component = options.component || jiraConfig.default_issue_component[options.project];
             options.type = options.type || jiraConfig.default_issue_type[options.project];
             options.version = options.version || jiraConfig.default_issue_version[options.project];
-            callback();
-        },
-        function(callback) {
+
             // If the assignee was not specified on the command options or there
             // is no issue number no need for search the user.
             if (!options.originalAssignee || !options.number) {
@@ -720,16 +678,21 @@ Jira.prototype.getUpdatePayload_ = function(opt_callback) {
             }
         },
         function(callback) {
-            instance.getProjectComponentByName_(
-                options.project, options.component, function(err, data) {
-                    if (!err) {
-                        component = data;
-                    }
-                    if (!component) {
-                        err = 'No component found, try --component "JavaScript".';
-                    }
-                    callback(err);
-                });
+            if (!options.component) {
+                callback();
+            }
+            else {
+                instance.getProjectComponentByName_(
+                    options.project, options.component, function(err, data) {
+                        if (!err) {
+                            component = data;
+                        }
+                        if (!component) {
+                            err = 'No component found, try --component "JavaScript".';
+                        }
+                        callback(err);
+                    });
+            }
         },
         function(callback) {
             // Since priority is not required in many JIRA configurations, skip
