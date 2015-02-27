@@ -19,6 +19,10 @@
     "keywords": [
         "gh", "nodegh", "jira", "plugin"
     ],
+    "bin": [
+        "gh-ji": "bin/jira.js",
+        "gh-jira": "bin/jira.js"
+    ],
     "scripts": {
         "lint": "node_modules/.bin/jshint bin/ test/",
         "test": "node_modules/.bin/mocha --reporter list"
