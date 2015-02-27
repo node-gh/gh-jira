@@ -304,7 +304,7 @@ Jira.prototype.run = function() {
 
         if (options.comment) {
             logger.logTemplate(
-                '{{prefix}} [info] Adding comment on issue {{greenBright "#" options.number}}', {
+                '[info] Adding comment on issue {{greenBright "#" options.number}}', {
                     options: options
                 });
 
@@ -319,7 +319,7 @@ Jira.prototype.run = function() {
         if (options.new) {
             if (options.project) {
                 logger.logTemplate(
-                    '{{prefix}} [info] Creating a new issue on project {{greenBright options.project}}', {
+                    '[info] Creating a new issue on project {{greenBright options.project}}', {
                         options: options
                     });
 
@@ -354,7 +354,7 @@ Jira.prototype.run = function() {
                 }
                 else {
                     logger.logTemplate(
-                        '{{prefix}} [info] Updating issue {{greenBright options.number}} to {{cyan options.transition}}', {
+                        '[info] Updating issue {{greenBright options.number}} to {{cyan options.transition}}', {
                             options: options
                         });
 
@@ -374,7 +374,7 @@ Jira.prototype.run = function() {
         if (options.update) {
             if (options.project) {
                 logger.logTemplate(
-                    '{{prefix}} [info] Updating issue {{cyan options.number}}', {
+                    '[info] Updating issue {{cyan options.number}}', {
                         options: options
                     });
 
@@ -1259,7 +1259,7 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
 
             if (action === Jira.ACTION_ISSUE_ASSIGN) {
                 logger.logTemplate(
-                    '{{prefix}} [info] Assigning issue to {{magentaBright options.assignee}}', {
+                    '[info] Assigning issue to {{magentaBright options.assignee}}', {
                         options: options
                     });
 
@@ -1273,7 +1273,7 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
                 callback();
             }
             else {
-                logger.logTemplate('{{prefix}} [info] Updating issue');
+                logger.logTemplate('[info] Updating issue');
 
                 instance.transition(number, action.name, function(err, data) {
                     if (!err) {
