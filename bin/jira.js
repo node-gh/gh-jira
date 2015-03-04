@@ -90,6 +90,8 @@ Jira.CRYPTO_ALGORITHM = 'AES-256-CBC';
 Jira.CRYPTO_PASSWORD = 'nodegh.io';
 
 Jira.setIssueNumber = function(branch, repo, options) {
+    var issue;
+
     if (!repo) {
         return;
     }
@@ -97,25 +99,26 @@ Jira.setIssueNumber = function(branch, repo, options) {
     // First, try to extract the issue number from the optional branch
     // name.
     if (branch) {
-        options.number = Jira.getIssueNumberFromText(branch);
+        issue = Jira.getIssueNumberFromText(branch);
     }
 
     // If number was not found, try to extract from the current
     // branch name.
-    if (!options.number) {
-        options.number = Jira.getIssueNumberFromText(git.getCurrentBranch());
+    if (!issue) {
+        issue = Jira.getIssueNumberFromText(git.getCurrentBranch());
     }
 
     // If number was not found yet, use only the first commit message to
     // infer the issue number. Use of more than one message can,
     // potentially, find a wrong issue number.
-    if (!options.number) {
-        options.number = Jira.getIssueNumberFromText(git.getCommitMessage(branch, 1));
+    if (!issue) {
+        issue = Jira.getIssueNumberFromText(git.getCommitMessage(branch, 1));
     }
 
     // Try to extract the project name from the found number.
-    if (options.number) {
+    if (issue) {
         options.project = Jira.getProjectName(options.number);
+        options.number = issue;
     }
 
     // If project was not found yet, use the last five commit messages to infer the project name.
