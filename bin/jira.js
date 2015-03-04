@@ -130,6 +130,10 @@ Jira.setIssueNumber = function(branch, repo, options) {
 Jira.getIssueNumberFromText = function(text) {
     var match;
 
+    if (!text) {
+        return;
+    }
+
     // Try uppercase sequence first, e.g. FOO-123.
     // If not found, try case-insensitive sequence, e.g. foo-123.
     match = text.match(/[A-Z]{3,}-\d+/) || text.match(/[a-z]{3,}-\d+/i);
