@@ -286,10 +286,14 @@ Jira.prototype.run = function() {
                 });
 
             instance.comment(function(err) {
-                logger.defaultCallback(
-                    err, null, logger.compileTemplate('{{jiraIssueLink}}', {
-                        options: options
-                    }));
+                if (err) {
+                    logger.error('Can\'t comment. ' + err);
+                    return;
+                }
+
+                logger.compileTemplate('{{jiraIssueLink}}', {
+                    options: options
+                });
             });
         }
 
@@ -301,14 +305,18 @@ Jira.prototype.run = function() {
                     });
 
                 instance.new(function(err, issue) {
+                    if (err) {
+                        logger.error('Can\'t create new JIRA issue. ' + err);
+                        return;
+                    }
+
                     if (issue) {
                         options.number = issue.key;
                     }
 
-                    logger.defaultCallback(
-                        err, null, logger.compileTemplate('{{jiraIssueLink}}', {
-                            options: options
-                        }));
+                    logger.compileTemplate('{{jiraIssueLink}}', {
+                        options: options
+                    });
                 });
             }
             else {
@@ -320,13 +328,15 @@ Jira.prototype.run = function() {
             if (options.number) {
                 if (String(options.transition) === 'true') {
                     instance.transitionWithQuestion_(
-                        options.number, options.transition, function(err, data) {
-                            if (err || data) {
-                                logger.defaultCallback(
-                                    err, null, logger.compileTemplate('{{jiraIssueLink}}', {
-                                        options: options
-                                    }));
+                        options.number, options.transition, function(err) {
+                            if (err) {
+                                logger.error('Can\'t transition. ' + err);
+                                return;
                             }
+
+                            logger.compileTemplate('{{jiraIssueLink}}', {
+                                options: options
+                            });
                         });
                 }
                 else {
@@ -336,10 +346,14 @@ Jira.prototype.run = function() {
                         });
 
                     instance.transition(options.number, options.transition, function(err) {
-                        logger.defaultCallback(
-                            err, null, logger.compileTemplate('{{jiraIssueLink}}', {
-                                options: options
-                            }));
+                        if (err) {
+                            logger.error('Can\'t transition. ' + err);
+                            return;
+                        }
+
+                        logger.compileTemplate('{{jiraIssueLink}}', {
+                            options: options
+                        });
                     });
                 }
             }
@@ -356,10 +370,14 @@ Jira.prototype.run = function() {
                     });
 
                 instance.update(options.number, function(err) {
-                    logger.defaultCallback(
-                        err, null, logger.compileTemplate('{{jiraIssueLink}}', {
-                            options: options
-                        }));
+                    if (err) {
+                        logger.error('Can\'t update issue. ' + err);
+                        return;
+                    }
+
+                    logger.compileTemplate('{{jiraIssueLink}}', {
+                        options: options
+                    });
                 });
             }
             else {
