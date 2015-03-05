@@ -217,7 +217,7 @@ Jira.prototype.run = function() {
             }
             else {
                 instance.login_(function() {
-                    logger.success('Writing GH config data.');
+                    logger.log('Writing GH config data.');
                     callback();
                 });
             }
