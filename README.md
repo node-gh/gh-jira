@@ -15,7 +15,7 @@ NodeGH plugin for integrating [Jira](https://www.atlassian.com/software/jira), a
 ## Install
 
 ```
-[sudo] npm install -g gh-jira
+[sudo] npm install -g gh gh-jira
 ```
 
 ## Usage
