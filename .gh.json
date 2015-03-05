@@ -14,7 +14,7 @@
             "close": {
                 "before": [],
                 "after": [
-                    { "cmd": "gh", "args": ["jira", "{{jira.number.previous}}"] }
+                    "gh jira {{jira.number.previous}}"
                 ]
             },
             "fetch": {
@@ -26,19 +26,19 @@
             "fwd": {
                 "before": [],
                 "after": [
-                    { "cmd": "gh", "args": ["jira", "{{jira.number.current}}", "--assignee", "{{options.fwd}}", "--submittedLink", "{{forwardedLink}}"] }
+                    "gh jira {{jira.number.current}} --assignee {{options.fwd}} --submittedLink {{forwardedLink}}"
                 ]
             },
             "merge": {
                 "before": [],
                 "after": [
-                    { "cmd": "gh", "args": ["jira", "{{jira.number.previous}}"] }
+                    "gh jira {{jira.number.previous}}"
                 ]
             },
             "submit": {
                 "before": [],
                 "after": [
-                    { "cmd": "gh", "args": ["jira", "{{jira.number.previous}}", "--assignee", "{{options.submit}}", "--submittedLink", "{{submittedLink}}"] }
+                    "gh jira {{jira.number.previous}} --assignee {{options.submit}} --submittedLink {{submittedLink}}"
                 ]
             }
         }
