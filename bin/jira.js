@@ -97,8 +97,8 @@ Jira.CRYPTO_ALGORITHM = 'AES-256-CBC';
 Jira.CRYPTO_PASSWORD = 'nodegh.io';
 
 Jira.CANCEL_MESSAGE = 'Cancel';
-Jira.ASSIGN_TO_ME_MESSAGE = 'Assign to me'
-Jira.OPEN_ISSUE_IN_BROWSER_MESSAGE = 'Open in browser'
+Jira.ASSIGN_TO_ME_MESSAGE = 'Assign to me';
+Jira.OPEN_ISSUE_IN_BROWSER_MESSAGE = 'Open in browser';
 
 Jira.setIssueNumber = function(branch, repo, options) {
     var issue;
