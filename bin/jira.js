@@ -302,7 +302,7 @@ Jira.prototype.run = function() {
                     return;
                 }
 
-                logger.compileTemplate('{{jiraIssueLink}}', {
+                logger.logTemplate('{{jiraIssueLink}}', {
                     options: options
                 });
             });
@@ -325,7 +325,7 @@ Jira.prototype.run = function() {
                         options.number = issue.key;
                     }
 
-                    logger.compileTemplate('{{jiraIssueLink}}', {
+                    logger.logTemplate('{{jiraIssueLink}}', {
                         options: options
                     });
                 });
@@ -374,7 +374,7 @@ Jira.prototype.run = function() {
                                 return;
                             }
 
-                            logger.compileTemplate('{{jiraIssueLink}}', {
+                            logger.logTemplate('{{jiraIssueLink}}', {
                                 options: options
                             });
                         });
@@ -391,7 +391,7 @@ Jira.prototype.run = function() {
                             return;
                         }
 
-                        logger.compileTemplate('{{jiraIssueLink}}', {
+                        logger.logTemplate('{{jiraIssueLink}}', {
                             options: options
                         });
                     });
@@ -415,7 +415,7 @@ Jira.prototype.run = function() {
                         return;
                     }
 
-                    logger.compileTemplate('{{jiraIssueLink}}', {
+                    logger.logTemplate('{{jiraIssueLink}}', {
                         options: options
                     });
                 });
