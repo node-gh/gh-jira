@@ -707,21 +707,16 @@ Jira.prototype.getUpdatePayload_ = function(opt_callback) {
             }
         },
         function(callback) {
-            if (!options.component) {
-                callback();
-            }
-            else {
-                instance.getProjectComponentByName_(
-                    options.project, options.component, function(err, data) {
-                        if (!err) {
-                            component = data;
-                        }
-                        if (!component) {
-                            err = 'No component found, try --component "JavaScript".';
-                        }
-                        callback(err);
-                    });
-            }
+            instance.getProjectComponentByName_(
+                options.project, options.component, function(err, data) {
+                    if (!err) {
+                        component = data;
+                    }
+                    if (!component) {
+                        err = 'No component found, try --component "JavaScript".';
+                    }
+                    callback(err);
+                });
         },
         function(callback) {
             // Since priority is not required in many JIRA configurations, skip
