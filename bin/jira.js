@@ -1224,7 +1224,7 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
                 [
                     {
                         choices: choices,
-                        message: 'What do you want to do with ' + logger.clc.greenBright(issue.key + ' ' + issue.fields.summary) + '?',
+                        message: logger.clc.cyan(issue.key) + ' ' + issue.fields.summary,
                         name: 'transition',
                         type: 'list'
                     }
