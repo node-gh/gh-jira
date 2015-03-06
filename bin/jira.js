@@ -316,8 +316,31 @@ Jira.prototype.run = function() {
                     });
 
                 instance.new(function(err, issue) {
+                    var errRes,
+                        eachErr;
+
                     if (err) {
-                        logger.error('Can\'t create new JIRA issue. ' + err);
+                        if (typeof err !== 'object' || typeof err.errorMessages !== 'object') {
+                            logger.error(err);
+                            return;
+                        }
+
+                        errRes = err.errorMessages.join(' ');
+
+                        for (eachErr in err.errors) {
+                            if (err.errors.hasOwnProperty(eachErr)) {
+                                errRes += eachErr + ': ';
+
+                                if (typeof err.errors[eachErr] === 'string') {
+                                     errRes += err.errors[eachErr];
+                                }
+                                else {
+                                    errRes += JSON.stringify(err.errors[eachErr]);
+                                }
+                            }
+                        }
+
+                        logger.error(errRes);
                         return;
                     }
 
