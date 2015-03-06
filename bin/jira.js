@@ -1243,7 +1243,7 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
                             break;
                         case Jira.CANCEL_MESSAGE:
                             if (options.assignee) {
-                                action = Jira.ACTION_ISSUE_ASSIGN;
+                                action = undefined;
                             }
                             break;
                         default:
