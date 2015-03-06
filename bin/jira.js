@@ -1306,9 +1306,6 @@ Jira.prototype.update = function(number, opt_callback) {
         },
         function(callback) {
             instance.deleteObjectEmptyValues_(payload);
-            callback();
-        },
-        function(callback) {
             instance.api.updateIssue(number, payload, function(err, data) {
                 if (!err) {
                     issue = data;
