@@ -89,6 +89,10 @@ Jira.CRYPTO_ALGORITHM = 'AES-256-CBC';
 
 Jira.CRYPTO_PASSWORD = 'nodegh.io';
 
+Jira.CANCEL_MESSAGE = 'Cancel';
+Jira.ASSIGN_TO_ME_MESSAGE = 'Assign to me'
+Jira.OPEN_ISSUE_IN_BROWSER_MESSAGE = 'Open in browser'
+
 Jira.setIssueNumber = function(branch, repo, options) {
     var issue;
 
@@ -1211,9 +1215,9 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
         },
         function(callback) {
             choices = [
-                'Nothing, thanks',
-                'Assign to me',
-                'Open in browser',
+                Jira.CANCEL_MESSAGE,
+                Jira.ASSIGN_TO_ME_MESSAGE,
+                Jira.OPEN_ISSUE_IN_BROWSER_MESSAGE,
                 new inquirer.Separator()
             ];
             transitions.forEach(function(val) {
@@ -1230,14 +1234,14 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
                     }
                 ], function(answers) {
                     switch (answers.transition) {
-                        case 'Assign to me':
+                        case Jira.ASSIGN_TO_ME_MESSAGE:
                             action = Jira.ACTION_ISSUE_ASSIGN;
                             options.assignee = jiraConfig.user;
                             break;
-                        case 'Open in browser':
+                        case Jira.OPEN_ISSUE_IN_BROWSER_MESSAGE:
                             action = Jira.ACTION_ISSUE_OPEN_IN_BROWSER;
                             break;
-                        case 'Nothing, thanks':
+                        case Jira.CANCEL_MESSAGE:
                             if (options.assignee) {
                                 action = Jira.ACTION_ISSUE_ASSIGN;
                             }
