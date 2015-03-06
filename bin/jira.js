@@ -35,6 +35,7 @@ Jira.DETAILS = {
     alias: 'ji',
     iterative: 'number',
     commands: [
+        'assign',
         'browser',
         'comment',
         'new',
@@ -43,6 +44,7 @@ Jira.DETAILS = {
     ],
     description: 'NodeGH plugin for integrating Jira, an issue management system.',
     options: {
+        'assign': Boolean,
         'assignee': String,
         'browser': Boolean,
         'comment': String,
@@ -77,6 +79,11 @@ Jira.DETAILS = {
         'v': ['--version']
     },
     payload: function(payload, options) {
+        if (!options.transition && options.assignee) {
+            options.assign = true;
+            return;
+        }
+
         options.transition = payload[1] || true;
     }
 };
@@ -202,6 +209,7 @@ Jira.prototype.run = function() {
 
     options.originalAssignee = options.assignee;
     options.assignee = options.assignee || jiraConfig.user;
+    options.jira = jiraConfig;
 
     operations = [
         function(callback) {
@@ -325,6 +333,35 @@ Jira.prototype.run = function() {
             else {
                 logger.warn('Project name not found, try with --project.');
             }
+        }
+
+        if (options.assign) {
+            instance.assign(options.number, options.assignee, function (err, response) {
+                if (err) {
+                    logger.error('Can\'t assign. ' + err);
+                    return;
+                }
+
+                switch (response.statusCode) {
+                    case 204:
+                       logger.log('Issue assigned to ' + options.assignee);
+                       logger.logTemplate('{{jiraIssueLink}}', {
+                            options: options
+                        });
+                       break;
+                    case 400:
+                        logger.error('There is a problem with the received user representation.');
+                        break;
+                    case 401:
+                        logger.error('Calling user has no permission to assign the issue.');
+                        break;
+                    case 404:
+                        logger.error('Either the issue or the user does not exist.');
+                        break;
+                    default:
+                        logger.error('There was an error trying to assign the issue.');
+                }
+            });
         }
 
         if (options.transition) {
@@ -1100,6 +1137,22 @@ Jira.prototype.selectUserWithQuestion_ = function(users, callback) {
         ], function(answers) {
             callback(answers.username);
         });
+};
+
+Jira.prototype.assign = function(number, name, opt_callback) {
+    var options,
+        payload = {name: name};
+
+    options = {
+        rejectUnauthorized: this.api.strictSSL,
+        uri: this.api.makeUri('/issue/' + number + '/assignee'),
+        method: 'PUT',
+        followAllRedirects: true,
+        json: true,
+        body: payload
+    };
+
+    this.api.request(options, opt_callback);
 };
 
 Jira.prototype.transition = function(number, name, opt_callback) {
