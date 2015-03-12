@@ -128,8 +128,8 @@ Jira.setIssueNumber = function(branch, repo, options) {
 
     // Try to extract the project name from the found number.
     if (issue) {
-        options.project = Jira.getProjectName(options.number);
-        options.number = issue;
+        options.project = Jira.getProjectName(options.jiraNumber);
+        options.jiraNumber = issue;
     }
 
     // If project was not found yet, use the last five commit messages to infer the project name.
@@ -174,7 +174,7 @@ exports.setupAfterHooks = function(context, done) {
         context.jira.number = {};
     }
 
-    context.jira.number.current = options.number;
+    context.jira.number.current = options.jiraNumber;
 
     done();
 };
@@ -190,7 +190,7 @@ exports.setupBeforeHooks = function(context, done) {
         context.jira.number = {};
     }
 
-    context.jira.number.previous = options.number;
+    context.jira.number.previous = options.jiraNumber;
 
     done();
 };
@@ -206,7 +206,7 @@ Jira.prototype.run = function() {
     instance.expandAliases_(options);
 
     instance.registerLoggerHelpers_();
-
+    options.jiraNumber = options.number;
     options.originalAssignee = options.assignee;
     options.assignee = options.assignee || jiraConfig.user;
     options.jira = jiraConfig;
@@ -251,7 +251,7 @@ Jira.prototype.run = function() {
 
             // If the assignee was not specified on the command options or there
             // is no issue number no need for search the user.
-            if (!options.originalAssignee || !options.number) {
+            if (!options.originalAssignee || !options.jiraNumber) {
                 callback();
                 return;
             }
@@ -287,12 +287,12 @@ Jira.prototype.run = function() {
         }
 
         if (options.browser) {
-            instance.browser(options.number);
+            instance.browser(options.jiraNumber);
         }
 
         if (options.comment) {
             logger.logTemplate(
-                'Adding comment on issue {{greenBright "#" options.number}}', {
+                'Adding comment on issue {{greenBright "#" options.jiraNumber}}', {
                     options: options
                 });
 
@@ -345,7 +345,7 @@ Jira.prototype.run = function() {
                     }
 
                     if (issue) {
-                        options.number = issue.key;
+                        options.jiraNumber = issue.key;
                     }
 
                     logger.logTemplate('{{jiraIssueLink}}', {
@@ -359,7 +359,7 @@ Jira.prototype.run = function() {
         }
 
         if (options.assign) {
-            instance.assign(options.number, options.assignee, function (err, response) {
+            instance.assign(options.jiraNumber, options.assignee, function (err, response) {
                 if (err) {
                     logger.error('Can\'t assign. ' + err);
                     return;
@@ -388,10 +388,10 @@ Jira.prototype.run = function() {
         }
 
         if (options.transition) {
-            if (options.number) {
+            if (options.jiraNumber) {
                 if (String(options.transition) === 'true') {
                     instance.transitionWithQuestion_(
-                        options.number, options.transition, function(err) {
+                        options.jiraNumber, options.transition, function(err) {
                             if (err) {
                                 logger.error('Can\'t transition. ' + err);
                                 return;
@@ -404,11 +404,11 @@ Jira.prototype.run = function() {
                 }
                 else {
                     logger.logTemplate(
-                        'Updating issue {{greenBright options.number}} to {{cyan options.transition}}', {
+                        'Updating issue {{greenBright options.jiraNumber}} to {{cyan options.transition}}', {
                             options: options
                         });
 
-                    instance.transition(options.number, options.transition, function(err) {
+                    instance.transition(options.jiraNumber, options.transition, function(err) {
                         if (err) {
                             logger.error('Can\'t transition. ' + err);
                             return;
@@ -428,11 +428,11 @@ Jira.prototype.run = function() {
         if (options.update) {
             if (options.project) {
                 logger.logTemplate(
-                    'Updating issue {{cyan options.number}}', {
+                    'Updating issue {{cyan options.jiraNumber}}', {
                         options: options
                     });
 
-                instance.update(options.number, function(err) {
+                instance.update(options.jiraNumber, function(err) {
                     if (err) {
                         logger.error('Can\'t update issue. ' + err);
                         return;
@@ -480,7 +480,7 @@ Jira.prototype.comment = function(opt_callback) {
 
     operations = [
         function(callback) {
-            instance.getIssue_(options.number, function(err, data) {
+            instance.getIssue_(options.jiraNumber, function(err, data) {
                 if (!err) {
                     issue = data;
                 }
@@ -1077,7 +1077,7 @@ Jira.prototype.registerLoggerHelpers_ = function() {
         options = instance.options;
 
     logger.registerHelper('jiraIssueLink', function() {
-        return instance.getIssueUrl_(options.number);
+        return instance.getIssueUrl_(options.jiraNumber);
     });
 };
 
@@ -1282,7 +1282,7 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
             });
         },
         function(callback) {
-            instance.getIssue_(options.number, function(err, data) {
+            instance.getIssue_(options.jiraNumber, function(err, data) {
                 if (!err) {
                     issue = data;
                 }
@@ -1343,13 +1343,13 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
                         options: options
                     });
 
-                instance.update(options.number, function(err, issue) {
+                instance.update(options.jiraNumber, function(err, issue) {
                     response = issue;
                     callback(err);
                 });
             }
             else if (action === Jira.ACTION_ISSUE_OPEN_IN_BROWSER) {
-                instance.browser(options.number);
+                instance.browser(options.jiraNumber);
                 callback();
             }
             else {
