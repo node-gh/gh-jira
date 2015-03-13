@@ -57,7 +57,7 @@ Jira.DETAILS = {
         'reporter': String,
         'submittedLink': String,
         'title': String,
-        'transition': [Boolean, String],
+        'transition': [String, Boolean],
         'type': String,
         'update': Boolean,
         'version': String
