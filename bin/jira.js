@@ -79,12 +79,9 @@ Jira.DETAILS = {
         'v': ['--version']
     },
     payload: function(payload, options) {
-        if (!options.transition && options.assignee) {
-            options.assign = true;
-            return;
+        if (!options.assign) {
+            options.transition = payload[1] || true;
         }
-
-        options.transition = payload[1] || true;
     }
 };
 
