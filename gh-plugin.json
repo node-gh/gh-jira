@@ -26,7 +26,7 @@
             "fwd": {
                 "before": [],
                 "after": [
-                    "gh jira {{jira.number.current}} --assignee {{options.fwd}} --submittedLink {{forwardedLink}}"
+                    "gh jira {{jira.number.current}} --assignee {{options.fwd}} --submittedLink {{forwardedLink}} --transition"
                 ]
             },
             "merge": {
@@ -38,7 +38,7 @@
             "submit": {
                 "before": [],
                 "after": [
-                    "gh jira {{jira.number.previous}} --assignee {{options.submit}} --submittedLink {{submittedLink}}"
+                    "gh jira {{jira.number.previous}} --assignee {{options.submit}} --submittedLink {{submittedLink}} --transition"
                 ]
             }
         }
