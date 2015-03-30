@@ -558,8 +558,16 @@ Jira.prototype.expandAliases_ = function(options) {
 
 Jira.prototype.expandComment_ = function(comment) {
     var instance = this;
+    var expanded = '';
 
-    return '{markdown}' + comment + instance.expandEmoji_(config.signature) + '{markdown}';
+    expanded = comment + instance.expandEmoji_(config.signature);
+
+    if (config.markdown) {
+	expanded = '{markdown}' + expanded + '{markdown}';
+    }
+
+    return expanded;
+
 };
 
 Jira.prototype.expandEmoji_ = function(content) {
