@@ -20,32 +20,11 @@ NodeGH plugin for integrating [Jira](https://www.atlassian.com/software/jira), a
 
 ## Usage
 
-Note: Run the following *inside* a git repository as otherwise it will show
-an error.
-
 ```
 gh jira
 ```
 
 > **Alias:** `gh ji`
-
-On first run it will ask for your jira 'username' and 'password'.
-This will create `~/.gh.json` and then fail because it does not yet
-know your jira server.
-
-To fix this edit `~/.gh.json` and add a `host` to the `jira` section
-so you will get something like the following:
-
-```
-    "plugins": {
-        "jira": {
-	    "host": "issues.jboss.org",
-            "user": "maxandersen",
-            "password": "secrethash"
-        }
-    },
-
-```
 
 ### 1. Create
 
