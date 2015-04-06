@@ -559,11 +559,12 @@ Jira.prototype.expandAliases_ = function(options) {
 Jira.prototype.expandComment_ = function(comment) {
     var instance = this;
 
-    return '{markdown}' + comment + instance.expandEmoji_(config.signature) + '{markdown}';
+    return comment + instance.expandEmoji_(config.signature);
 };
 
 Jira.prototype.expandEmoji_ = function(content) {
-    return content.replace(':octocat:', '![NodeGH](http://nodegh.io/images/octocat.png)');
+    return content.replace('<br><br>:octocat:', '\n\n\\\\\n\n!http://nodegh.io/images/octocat.png!')
+        .replace('*Sent from [GH](http://nodegh.io).*', '_Sent from [GH|http://nodegh.io/]_');
 };
 
 Jira.prototype.expandTransitionFields_ = function(transitionConfig, transition, payload, opt_callback) {
