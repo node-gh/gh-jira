@@ -11,6 +11,7 @@
     "latedef": true,
     "noarg": true,
     "node": true,
+    "mocha": true,
     "nomen": false,
     "onevar": true,
     "passfail": false,
