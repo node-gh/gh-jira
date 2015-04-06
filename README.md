@@ -55,6 +55,12 @@ gh jira --new --project LPS --title 'Node GH rocks!' --message 'Body with **Mark
 gh jira --new --project LPS --title 'Node GH rocks!' --component UI
     ```
 
+* Create a new, unassigned, issue.
+    ```
+gh jira --new --project LPS --title 'Node GH rocks!' --unassigned
+    ```
+
+
 * Create a new issue and assign it to someone.
 
     ```
@@ -126,6 +132,12 @@ gh jira LPS-123 --transition
 
     ```
 gh jira LPS-123 --assignee brianchandotcom --transition
+    ```
+
+* Show valid transitions for the issue and unassign it.
+
+    ```
+gh jira LPS-123 --unassign --transition
     ```
 
 ## Testing

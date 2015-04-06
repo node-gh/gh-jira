@@ -46,6 +46,7 @@ Jira.DETAILS = {
     options: {
         'assign': Boolean,
         'assignee': String,
+        'unassign': Boolean,
         'browser': Boolean,
         'comment': String,
         'component': String,
@@ -297,6 +298,16 @@ Jira.prototype.run = function() {
             });
         }
 
+        if (options.unassign) {
+            options.assign = true;
+            options.unassigned = true;
+        }
+
+
+        if (options.unassigned) {
+            options.assignee = null;
+        }
+
         if (options.new) {
             if (options.project) {
                 logger.logTemplate(
@@ -356,10 +367,16 @@ Jira.prototype.run = function() {
 
                 switch (response.statusCode) {
                     case 204:
-                       logger.log('Issue assigned to ' + options.assignee);
-                       logger.logTemplate('{{jiraIssueLink}}', {
-                            options: options
-                        });
+                        if (options.assignee) {
+                            logger.log('Issue assigned to ' + options.assignee);
+                        }
+                        else {
+                            logger.log('Issue unassigned.');
+                        }
+
+                        logger.log(logger.logTemplate('{{jiraIssueLink}}', {
+                                options: options
+                            }));
                        break;
                     case 400:
                         logger.error('There is a problem with the received user representation.');
@@ -809,9 +826,6 @@ Jira.prototype.getUpdatePayload_ = function(opt_callback) {
         function(callback) {
             payload = {
                 fields: {
-                    assignee: {
-                        name: options.assignee
-                    },
                     components: [
                         {
                             id: component.id
@@ -845,6 +859,12 @@ Jira.prototype.getUpdatePayload_ = function(opt_callback) {
             if (options.reporter && (!options.new || options.reporter !== jiraConfig.user)) {
                 payload.fields.reporter = {
                     name: options.reporter
+                };
+            }
+
+            if (options.assignee !== undefined) {
+                payload.assignee = {
+                    name: options.assignee
                 };
             }
 
