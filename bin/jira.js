@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+'use strict';
+
 /*
  * Copyright 2013, All Rights Reserved.
  *
@@ -281,10 +283,7 @@ Jira.prototype.run = function() {
         }
 
         if (options.comment) {
-            logger.logTemplate(
-                'Adding comment on issue {{greenBright "#" options.jiraNumber}}', {
-                    options: options
-                });
+            logger.log('Adding comment on issue ' + logger.colors.green('#' + options.jiraNumber));
 
             instance.comment(function(err) {
                 if (err) {
@@ -292,9 +291,7 @@ Jira.prototype.run = function() {
                     return;
                 }
 
-                logger.logTemplate('{{jiraIssueLink}}', {
-                    options: options
-                });
+                logger.log(instance.getIssueUrl_(options.jiraNumber));
             });
         }
 
@@ -310,10 +307,7 @@ Jira.prototype.run = function() {
 
         if (options.new) {
             if (options.project) {
-                logger.logTemplate(
-                    'Creating a new issue on project {{greenBright options.project}}', {
-                        options: options
-                    });
+                logger.log('Creating a new issue on project ' + logger.colors.green(options.project));
 
                 instance.new(function(err, issue) {
                     var errRes,
@@ -348,9 +342,7 @@ Jira.prototype.run = function() {
                         options.jiraNumber = issue.key;
                     }
 
-                    logger.logTemplate('{{jiraIssueLink}}', {
-                        options: options
-                    });
+                    logger.log(instance.getIssueUrl_(options.jiraNumber));
                 });
             }
             else {
@@ -374,9 +366,7 @@ Jira.prototype.run = function() {
                             logger.log('Issue unassigned.');
                         }
 
-                        logger.log(logger.logTemplate('{{jiraIssueLink}}', {
-                                options: options
-                            }));
+                        logger.log(instance.getIssueUrl_(options.jiraNumber));
                        break;
                     case 400:
                         logger.error('There is a problem with the received user representation.');
@@ -403,16 +393,11 @@ Jira.prototype.run = function() {
                                 return;
                             }
 
-                            logger.logTemplate('{{jiraIssueLink}}', {
-                                options: options
-                            });
+                            logger.log(instance.getIssueUrl_(options.jiraNumber));
                         });
                 }
                 else {
-                    logger.logTemplate(
-                        'Updating issue {{greenBright options.jiraNumber}} to {{cyan options.transition}}', {
-                            options: options
-                        });
+                    logger.log('Updating issue ' + logger.colors.green(options.jiraNumber) + ' to ' + logger.colors.cyan(options.transition));
 
                     instance.transition(options.jiraNumber, options.transition, function(err) {
                         if (err) {
@@ -420,9 +405,7 @@ Jira.prototype.run = function() {
                             return;
                         }
 
-                        logger.logTemplate('{{jiraIssueLink}}', {
-                            options: options
-                        });
+                        logger.log(instance.getIssueUrl_(options.jiraNumber));
                     });
                 }
             }
@@ -433,10 +416,7 @@ Jira.prototype.run = function() {
 
         if (options.update) {
             if (options.project) {
-                logger.logTemplate(
-                    'Updating issue {{cyan options.jiraNumber}}', {
-                        options: options
-                    });
+                logger.log('Updating issue ' + logger.colors.cyan(options.jiraNumber));
 
                 instance.update(options.jiraNumber, function(err) {
                     if (err) {
@@ -444,9 +424,7 @@ Jira.prototype.run = function() {
                         return;
                     }
 
-                    logger.logTemplate('{{jiraIssueLink}}', {
-                        options: options
-                    });
+                    logger.log(instance.getIssueUrl_(options.jiraNumber));
                 });
             }
             else {
@@ -1327,7 +1305,7 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
                 [
                     {
                         choices: choices,
-                        message: logger.clc.cyan(issue.key) + ' ' + issue.fields.summary,
+                        message: issue.key + ' ' + issue.fields.summary,
                         name: 'transition',
                         type: 'list'
                     }
@@ -1364,10 +1342,7 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
             }
 
             if (action === Jira.ACTION_ISSUE_ASSIGN) {
-                logger.logTemplate(
-                    'Assigning issue to {{magentaBright options.assignee}}', {
-                        options: options
-                    });
+                logger.log('Assigning issue to ' + logger.colors.magenta(options.assignee));
 
                 instance.update(options.jiraNumber, function(err, issue) {
                     response = issue;
@@ -1379,7 +1354,7 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
                 callback();
             }
             else {
-                logger.logTemplate('Updating issue');
+                logger.log('Updating issue');
 
                 instance.transition(number, action.name, function(err, data) {
                     if (!err) {
