@@ -1,7 +1,7 @@
 {
     "name": "gh-jira",
     "description": "NodeGH plugin for integrating Jira, an issue management system",
-    "version": "0.5.6",
+    "version": "0.5.7",
     "author": {
         "name": "Eduardo Lundgren",
         "email": "eduardolundgren@gmail.com",
