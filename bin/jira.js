@@ -1283,12 +1283,14 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
             });
         },
         function(callback) {
+            var assignToSomeone = Jira.ASSIGN_TO_SOMEONE_MESSAGE + ' ' + options.assignee;
+
             choices = [
                 Jira.CANCEL_MESSAGE,
             ];
 
             if (options.assignee) {
-                choices.push(Jira.ASSIGN_TO_SOMEONE_MESSAGE + ' ' + options.assignee);
+                choices.push(assignToSomeone);
             }
 
             choices.push(
@@ -1315,7 +1317,7 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
                             action = Jira.ACTION_ISSUE_ASSIGN;
                             options.assignee = jiraConfig.user;
                             break;
-                        case Jira.ASSIGN_TO_SOMEONE_MESSAGE:
+                        case assignToSomeone:
                             action = Jira.ACTION_ISSUE_ASSIGN;
                             break;
                         case Jira.OPEN_ISSUE_IN_BROWSER_MESSAGE:
