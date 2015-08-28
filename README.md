@@ -6,8 +6,6 @@
 [![Dependencies Status](http://img.shields.io/david/node-gh/gh-jira.svg?style=flat)](https://david-dm.org/node-gh/gh-jira)
 [![DevDependencies Status](http://img.shields.io/david/dev/node-gh/gh-jira.svg?style=flat)](https://david-dm.org/node-gh/gh-jira#info=devDependencies)
 
-![Inspectocat](https://cloud.githubusercontent.com/assets/398893/3528241/5cca20fc-078d-11e4-80fc-a68f2c8f205e.png)
-
 NodeGH plugin for integrating [Jira](https://www.atlassian.com/software/jira), an issue management system.
 
 > Maintained by [Eduardo Lundgren](https://github.com/eduardolundgren).
