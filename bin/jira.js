@@ -1269,7 +1269,7 @@ Jira.prototype.transitionWithQuestion_ = function(number, name, opt_callback) {
         function(callback) {
             instance.api.listTransitions(number, function(err, data) {
                 if (!err) {
-                    transitions = data;
+                    transitions = data.transitions;
                 }
                 callback(err);
             });
