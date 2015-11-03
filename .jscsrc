@@ -1,0 +1,15 @@
+{
+    "esnext": true,
+    "preset": "crockford",
+    "disallowKeywordsOnNewLine": null,
+    "disallowDanglingUnderscores": true,
+    "disallowTrailingComma": true,
+    "disallowTrailingWhitespace": true,
+    "requireSpaceAfterKeywords": null,
+    "requireMultipleVarDecl": null,
+    "requireVarDeclFirst": false,
+    "disallowMultipleVarDecl": false,
+    "excludeFiles": [
+        "node_modules"
+    ]
+}

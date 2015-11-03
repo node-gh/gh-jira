@@ -1,14 +1,5 @@
 {
-    "api_version": "2",
-    "default_issue_component": {
-        "LPS": "UI"
-    },
-    "default_issue_type": {
-        "LPS": "Bug"
-    },
-    "default_issue_version": {
-        "LPS": "6.2.X"
-    },
+    "base": "rest/api/2",
     "hooks": {
         "pull-request": {
             "close": {
@@ -52,6 +43,12 @@
             "Fix Version/s": true
         },
         "Code Review Request": {
+            "Assignee": {
+                "name": "{{options.assignee}}"
+            },
+            "Git Pull Request": "{{options.submittedLink}}"
+        },
+        "Create Review Request": {
             "Assignee": {
                 "name": "{{options.assignee}}"
             },
