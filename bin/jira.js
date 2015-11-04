@@ -925,10 +925,12 @@ Jira.OPEN_ISSUE_IN_BROWSER_MESSAGE = 'Open in browser';
 
 Jira.USERS_NOT_FOUND_ERROR = 'Users not found.';
 
+let jira = new Jira();
+
 exports.setupAfterHooks = function (context, done) {
     var options = context.options;
 
-    Jira.setIssueNumber(options.pullBranch, options.repo, options);
+    jira.setIssueNumber(options.pullBranch, options.repo, options);
 
     context.jira = jiraConfig;
 
@@ -944,7 +946,7 @@ exports.setupAfterHooks = function (context, done) {
 exports.setupBeforeHooks = function (context, done) {
     var options = context.options;
 
-    Jira.setIssueNumber(options.pullBranch, options.repo, options);
+    jira.setIssueNumber(options.pullBranch, options.repo, options);
 
     context.jira = jiraConfig;
 
