@@ -24,6 +24,8 @@
         "gh-jira": "bin/jira.js"
     },
     "scripts": {
+        "prepublish": "./node_modules/babel/bin/babel.js bin/jira.js --loose all --out-file bin/jira.js",
+        "postpublish": "git checkout bin/jira.js",
         "lint": "node_modules/.bin/jshint bin/ test/",
         "test": "node_modules/.bin/mocha --reporter list"
     },
@@ -33,11 +35,12 @@
         "open": "^0.0.5"
     },
     "devDependencies": {
+        "babel": "^5.8",
         "jshint": "^2.8.0",
         "mocha": "^2.3.3"
     },
     "engines": {
-        "node": ">=4.0"
+        "node": ">=0.12"
     },
     "preferGlobal": "true"
 }
