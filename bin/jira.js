@@ -195,6 +195,11 @@ class Jira {
     }
 
     fatalErrorHandler (error) {
+        if (error instanceof Error) {
+            console.trace(error);
+            process.exit(1);
+        }
+
         if (!error || !error.response) {
             logger.error(error);
         }
