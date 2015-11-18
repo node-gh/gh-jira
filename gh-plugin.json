@@ -11,7 +11,7 @@
             "fetch": {
                 "before": [],
                 "after": [
-                    "{{#if jira.number.current}} gh jira {{jira.number.current}} --comment 'Just started reviewing :)' {{/if}}"
+                    "{{#if jira.number.current}} gh jira {{jira.number.current}}  --comment 'Just started reviewing [{{options.user}}/{{options.repo}}#{{options.number}}|https://github.com/{{options.user}}/{{options.repo}}/pull/{{options.number}}].' {{/if}}"
                 ]
             },
             "fwd": {
