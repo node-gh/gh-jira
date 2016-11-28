@@ -247,7 +247,7 @@ class Jira {
     runCommands () {
         return this.setAssigneeByGitHubUsername()
         .then(() => {
-            return ['new', 'update', 'transition', 'assign', 'comment', 'browser']
+            return ['new', 'update', 'transition', 'assign', 'comment', 'label', 'browser']
             .reduce((promise, item) => {
                 return promise.then(() => {
                     return this.callActionIfExists(item);
@@ -409,6 +409,29 @@ class Jira {
             return comment;
         });
     }
+
+    label (jiraNumber, label) {
+        return this.getIssue(jiraNumber)
+        .then((response) => {
+            let issue = response.body;
+            return this.api.put('/issue/' + this.api.encode(issue.id), {
+                body: {
+                    update: {
+                        labels: [
+                            {
+                                add: label
+                            }
+                        ]
+                    }
+                }
+            });
+        })
+        .then((result) => {
+            logger.log(this.getIssueUrl(jiraNumber));
+            return result;
+        });
+    }
+
 
     transitionSelector (issue) {
         var options = this.options;
@@ -688,6 +711,13 @@ class Jira {
         return this.comment(options.jiraNumber, options.comment);
     }
 
+    labelAction () {
+        var options = this.options;
+        logger.log('Adding label ' + options.label +' to issue ' + logger.colors.green('#' + options.jiraNumber));
+        return this.label(options.jiraNumber, options.label);
+    }
+
+
     encryptText (text) {
         var cipher = crypto.createCipher(
             Jira.CRYPTO_ALGORITHM, Jira.CRYPTO_PASSWORD);
@@ -870,6 +900,7 @@ Jira.DETAILS = {
         'unassign',
         'browser',
         'comment',
+        'label',
         'new',
         'transition',
         'update'
@@ -882,6 +913,7 @@ Jira.DETAILS = {
         'browser': Boolean,
         'comment': String,
         'component': String,
+        'label': String,
         'message': String,
         'new': Boolean,
         'number': [String, Array],
@@ -900,6 +932,7 @@ Jira.DETAILS = {
         'B': ['--browser'],
         'c': ['--comment'],
         'C': ['--component'],
+        'l': ['--label'],
         'm': ['--message'],
         'N': ['--new'],
         'n': ['--number'],
