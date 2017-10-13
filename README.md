@@ -140,7 +140,7 @@ gh jira LPS-123 --unassign --transition
 
 ## Testing
 
-Check [Travis](https://travis-ci.org/node-gh/gh-jira) for continous integration results.
+Check [Travis](https://travis-ci.org/node-gh/gh-jira) for continuous integration results.
 
 * Run [JSHint](http://www.jshint.com/), a tool to detect errors and potential problems.
 
