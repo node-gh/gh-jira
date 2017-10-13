@@ -72,7 +72,7 @@ class Jira {
 
         // Try uppercase sequence first, e.g. FOO-123.
         // If not found, try case-insensitive sequence, e.g. foo-123.
-        let match = text.match(/[A-Z]{3,}-\d+/) || text.match(/[a-z]{3,}-\d+/i);
+        let match = text.match(/[A-Z]{2,}-\d+/) || text.match(/[a-z]{2,}-\d+/i);
 
         if (match) {
             return match[0].toUpperCase();
