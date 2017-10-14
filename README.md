@@ -44,25 +44,25 @@ Option             | Usage        | Type
 * Create a new issue on a certain project.
 
     ```
-gh jira --new --project LPS --title 'Node GH rocks!' --message 'Body with **Markdown** support'
+    gh jira --new --project LPS --title 'Node GH rocks!' --message 'Body with **Markdown** support'
     ```
 
 * Create a new issue specifying the component.
 
     ```
-gh jira --new --project LPS --title 'Node GH rocks!' --component UI
+    gh jira --new --project LPS --title 'Node GH rocks!' --component UI
     ```
 
 * Create a new, unassigned, issue.
     ```
-gh jira --new --project LPS --title 'Node GH rocks!' --unassigned
+    gh jira --new --project LPS --title 'Node GH rocks!' --unassigned
     ```
 
 
 * Create a new issue and assign it to someone.
 
     ```
-gh jira --new --project LPS --title 'Node GH rocks!' --assignee eduardolundgren
+    gh jira --new --project LPS --title 'Node GH rocks!' --assignee eduardolundgren
     ```
 
 ### 2. Comment
@@ -79,7 +79,7 @@ Omitting `--number` will guess issue number from the last commit message.
 * Comment on an issue.
 
     ```
-gh jira LPS-123 --comment "Merged, **thank you**!"
+    gh jira LPS-123 --comment "Merged, **thank you**!"
     ```
 
 ### 3. Open in Browser
@@ -96,7 +96,7 @@ Omitting `--number` will guess issue number from the last commit message.
 * Open Jira issue page in the browser.
 
     ```
-gh jira LPS-123 --browser
+    gh jira LPS-123 --browser
     ```
 
 ### 4. Transition
@@ -117,41 +117,41 @@ Both Jira and GitHub usernames are supported `--assignee` values.
 * Start progress on an issue.
 
     ```
-gh jira LPS-123 --transition "Start Progress"
+    gh jira LPS-123 --transition "Start Progress"
     ```
 
 * Show valid transitions for the issue.
 
     ```
-gh jira LPS-123 --transition
+    gh jira LPS-123 --transition
     ```
 
 * Show valid transitions for the issue and assign to an user.
 
     ```
-gh jira LPS-123 --assignee brianchandotcom --transition
+    gh jira LPS-123 --assignee brianchandotcom --transition
     ```
 
 * Show valid transitions for the issue and unassign it.
 
     ```
-gh jira LPS-123 --unassign --transition
+    gh jira LPS-123 --unassign --transition
     ```
 
 ## Testing
 
-Check [Travis](https://travis-ci.org/node-gh/gh-jira) for continous integration results.
+Check [Travis](https://travis-ci.org/node-gh/gh-jira) for continuous integration results.
 
 * Run [JSHint](http://www.jshint.com/), a tool to detect errors and potential problems.
 
     ```
-npm run-script lint
+    npm run-script lint
     ```
 
 * Run [Mocha](http://mochajs.org/), a unit test framework.
 
     ```
-npm run-script test
+    npm run-script test
     ```
 
 ## Contributing
