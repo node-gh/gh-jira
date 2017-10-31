@@ -10,9 +10,7 @@
             },
             "fetch": {
                 "before": [],
-                "after": [
-                    "{{#if jira.number.current}} gh jira {{jira.number.current}}  --comment 'Just started reviewing [{{options.user}}/{{options.repo}}#{{options.number}}|https://github.com/{{options.user}}/{{options.repo}}/pull/{{options.number}}].' {{/if}}"
-                ]
+                "after": []
             },
             "fwd": {
                 "before": [],
@@ -49,6 +47,12 @@
             "Git Pull Request": "{{options.submittedLink}}"
         },
         "Create Review Request": {
+            "Assignee": {
+                "name": "{{options.assignee}}"
+            },
+            "Git Pull Request": "{{options.submittedLink}}"
+        },
+        "Send for Review": {
             "Assignee": {
                 "name": "{{options.assignee}}"
             },
