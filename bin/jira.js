@@ -96,15 +96,15 @@ class Jira {
                 username: query
             }
         })
-        .then((response) => {
-            let users = response.body;
+            .then((response) => {
+                let users = response.body;
 
-            if (!users || users.length === 0) {
-                throw Jira.USERS_NOT_FOUND_ERROR;
-            }
+                if (!users || users.length === 0) {
+                    throw Jira.USERS_NOT_FOUND_ERROR;
+                }
 
-            return users;
-        });
+                return users;
+            });
     }
 
     searchGithubUser (query) {
@@ -123,24 +123,24 @@ class Jira {
     searchUserByGitHubUsername (query) {
         return new Promise((resolve, reject) => {
             this.searchUsers(query)
-            .then((users) => {
-                resolve(users);
-            })
-            .catch((err) => {
-                logger.debug(query + ' was not found on Jira. Trying GitHub.');
-
-                if (err !== Jira.USERS_NOT_FOUND_ERROR) {
-                    reject(err);
-                }
-
-                return this.searchGithubUser(query)
-                .then((user) => {
-                    resolve(this.searchUsers(user.name));
+                .then((users) => {
+                    resolve(users);
                 })
-                .catch((error) => {
-                    reject(error);
+                .catch((err) => {
+                    logger.debug(query + ' was not found on Jira. Trying GitHub.');
+
+                    if (err !== Jira.USERS_NOT_FOUND_ERROR) {
+                        reject(err);
+                    }
+
+                    return this.searchGithubUser(query)
+                        .then((user) => {
+                            resolve(this.searchUsers(user.name));
+                        })
+                        .catch((error) => {
+                            reject(error);
+                        });
                 });
-            });
         });
     }
 
@@ -156,17 +156,17 @@ class Jira {
 
     findAssigneeByGitHubUsername (user) {
         return this.searchUserByGitHubUsername(user)
-        .then((users) => {
-            if (users.length === 1) {
-                return users[0].name;
-            }
+            .then((users) => {
+                if (users.length === 1) {
+                    return users[0].name;
+                }
 
-            return this.selectUserWithQuestion(users);
-        })
-        .catch((error) => {
-            logger.warn('Not found any user when looking for ' + user);
-            logger.error(error);
-        });
+                return this.selectUserWithQuestion(users);
+            })
+            .catch((error) => {
+                logger.warn('Not found any user when looking for ' + user);
+                logger.error(error);
+            });
     }
 
     run () {
@@ -177,21 +177,21 @@ class Jira {
         this.registerLoggerHelpers();
 
         return this.configureUser()
-        .then(() => {
-            if (jiraConfig.base === undefined) {
-                jiraConfig.base = Jira.DEFAULT_JIRA_BASE;
-            }
+            .then(() => {
+                if (jiraConfig.base === undefined) {
+                    jiraConfig.base = Jira.DEFAULT_JIRA_BASE;
+                }
 
-            this.api = new RestApiClient(jiraConfig);
+                this.api = new RestApiClient(jiraConfig);
 
-            // shortcut if only the browser command was invoked to avoid remote call
-            if (options.browser && lodash.intersection(Jira.DETAILS.commands, Object.keys(options)).length === 1) {
-                return this.browserAction();
-            }
+                // shortcut if only the browser command was invoked to avoid remote call
+                if (options.browser && lodash.intersection(Jira.DETAILS.commands, Object.keys(options)).length === 1) {
+                    return this.browserAction();
+                }
 
-            return this.runCommands();
-        })
-        .catch(this.fatalErrorHandler);
+                return this.runCommands();
+            })
+            .catch(this.fatalErrorHandler);
     }
 
     fatalErrorHandler (error) {
@@ -239,21 +239,21 @@ class Jira {
         }
 
         return this.findAssigneeByGitHubUsername(options.assignee)
-        .then((assignee) => {
-            options.assignee = assignee;
-        });
+            .then((assignee) => {
+                options.assignee = assignee;
+            });
     }
 
     runCommands () {
         return this.setAssigneeByGitHubUsername()
-        .then(() => {
-            return ['new', 'update', 'transition', 'assign', 'comment', 'label', 'browser']
-            .reduce((promise, item) => {
-                return promise.then(() => {
-                    return this.callActionIfExists(item);
-                });
-            }, Promise.resolve());
-        });
+            .then(() => {
+                return ['new', 'update', 'transition', 'assign', 'comment', 'label', 'browser', 'status']
+                    .reduce((promise, item) => {
+                        return promise.then(() => {
+                            return this.callActionIfExists(item);
+                        });
+                    }, Promise.resolve());
+            });
     }
 
     callActionIfExists (item) {
@@ -280,14 +280,14 @@ class Jira {
                 name: assignee
             }
         })
-        .then((response) => {
-            if (response.statusCode !== 204) {
-                logger.error('Can\'t assign issue (status code ' + response.statusCode + ')');
-            }
+            .then((response) => {
+                if (response.statusCode !== 204) {
+                    logger.error('Can\'t assign issue (status code ' + response.statusCode + ')');
+                }
 
-            logger.log(assignee ? 'Issue assigned to ' + assignee : 'Issue unassigned.');
-            logger.log(this.getIssueUrl(options.jiraNumber));
-        });
+                logger.log(assignee ? 'Issue assigned to ' + assignee : 'Issue unassigned.');
+                logger.log(this.getIssueUrl(options.jiraNumber));
+            });
     }
 
     getUpdatePayload () {
@@ -295,29 +295,29 @@ class Jira {
         var payload = {fields: {}};
 
         return this.getIssueEditMeta(options.jiraNumber)
-        .then((meta) => {
-            if (options.project && options.project !== payload.fields.project.key) {
-                // https://confluence.atlassian.com/jira/moving-an-issue-185729549.html
-                logger.warn('To move a Jira issue to another project you must use its web GUI.');
-            }
-
-            lodash.forEach(meta.fieldsMeta, (field, type) => {
-                if (field.required) {
-                    payload.fields[type] = meta.fields[type];
+            .then((meta) => {
+                if (options.project && options.project !== payload.fields.project.key) {
+                    // https://confluence.atlassian.com/jira/moving-an-issue-185729549.html
+                    logger.warn('To move a Jira issue to another project you must use its web GUI.');
                 }
 
-                let fieldValue = this.findFieldValue(type, options[type], field);
+                lodash.forEach(meta.fieldsMeta, (field, type) => {
+                    if (field.required) {
+                        payload.fields[type] = meta.fields[type];
+                    }
 
-                if (options[type] !== undefined && fieldValue) {
-                    payload.fields[type] = fieldValue;
-                }
+                    let fieldValue = this.findFieldValue(type, options[type], field);
+
+                    if (options[type] !== undefined && fieldValue) {
+                        payload.fields[type] = fieldValue;
+                    }
+                });
+
+                logger.debug('Payload for update');
+                logger.debug(JSON.stringify(payload, ' ', 4));
+
+                return payload;
             });
-
-            logger.debug('Payload for update');
-            logger.debug(JSON.stringify(payload, ' ', 4));
-
-            return payload;
-        });
     }
 
     getCreatePayload () {
@@ -326,28 +326,28 @@ class Jira {
         var payload = {fields: {}};
 
         return this.getNewIssueMeta(options.project, options.issuetype)
-        .then((data) => {
-            meta = data;
-            return this.openFieldQuestions(meta.fieldsMeta, payload);
-        })
-        .then(() => {
-            if (meta.issueTypeId) {
-                payload.fields.issuetype = {
-                    id: meta.issueTypeId
-                };
-            }
+            .then((data) => {
+                meta = data;
+                return this.openFieldQuestions(meta.fieldsMeta, payload);
+            })
+            .then(() => {
+                if (meta.issueTypeId) {
+                    payload.fields.issuetype = {
+                        id: meta.issueTypeId
+                    };
+                }
 
-            if (meta.projectId) {
-                payload.fields.project = {
-                    id: meta.projectId
-                };
-            }
+                if (meta.projectId) {
+                    payload.fields.project = {
+                        id: meta.projectId
+                    };
+                }
 
-            logger.debug('Payload for create');
-            logger.debug(JSON.stringify(payload, ' ', 4));
+                logger.debug('Payload for create');
+                logger.debug(JSON.stringify(payload, ' ', 4));
 
-            return payload;
-        });
+                return payload;
+            });
     }
 
     newAction () {
@@ -360,16 +360,16 @@ class Jira {
         logger.log('Creating a new issue on project ' + options.project);
 
         return this.getCreatePayload()
-        .then((issue) => {
-            return this.api.post('/issue', {
-                body: issue
+            .then((issue) => {
+                return this.api.post('/issue', {
+                    body: issue
+                });
+            })
+            .then((response) => {
+                let issue = response.body;
+                options.jiraNumber = issue.key;
+                logger.log(this.getIssueUrl(options.jiraNumber));
             });
-        })
-        .then((response) => {
-            let issue = response.body;
-            options.jiraNumber = issue.key;
-            logger.log(this.getIssueUrl(options.jiraNumber));
-        });
     }
 
     updateAction () {
@@ -378,58 +378,70 @@ class Jira {
         logger.log('Updating JIRA issue ' + options.jiraNumber);
 
         return this.getUpdatePayload()
-        .then((payload) => {
-            return this.api.put('/issue/' + this.api.encode(options.number), {
-                body: payload
+            .then((payload) => {
+                return this.api.put('/issue/' + this.api.encode(options.number), {
+                    body: payload
+                });
+            })
+            .then(() => {
+                logger.log(this.getIssueUrl(options.jiraNumber));
             });
-        })
-        .then(() => {
-            logger.log(this.getIssueUrl(options.jiraNumber));
-        });
     }
 
     getIssue (number) {
         return this.api.get('/issue/' + this.api.encode(number));
     }
 
+    getStatus (number) {
+        return this.api.get('/issue/' + this.api.encode(number), {
+            qs: {
+                fields: 'status'
+            }
+        }).then((response) => {
+            return response.body.fields.status.name;
+        }).catch((err) => {
+            logger.debug(query + ' was not found on Jira.');
+        });
+    }
+
     comment (jiraNumber, comment) {
         return this.getIssue(jiraNumber)
-        .then((response) => {
-            let issue = response.body;
-            comment = this.expandComment(logger.applyReplacements(comment));
+            .then((response) => {
+                let issue = response.body;
+                comment = this.expandComment(logger.applyReplacements(comment));
 
-            return this.api.post('/issue/' + this.api.encode(issue.id) + '/comment', {
-                body: {
-                    body: comment
-                }
+                return this.api.post('/issue/' + this.api.encode(issue.id) + '/comment', {
+                    body: {
+                        body: comment
+                    }
+                });
+            })
+            .then((comment) => {
+                logger.log(this.getIssueUrl(jiraNumber));
+                return comment;
             });
-        })
-        .then((comment) => {
-            logger.log(this.getIssueUrl(jiraNumber));
-            return comment;
-        });
     }
 
     label (jiraNumber, label) {
         return this.getIssue(jiraNumber)
-        .then((response) => {
-            let issue = response.body;
-            return this.api.put('/issue/' + this.api.encode(issue.id), {
-                body: {
-                    update: {
-                        labels: [
-                            {
-                                add: label
-                            }
-                        ]
+            .then((response) => {
+                let issue = response.body;
+                return this.api.put('/issue/' + this.api.encode(issue.id), {
+                    body: {
+                        update: {
+                            labels: [
+                                {
+                                    add: label
+                                }
+                            ]
+                        }
                     }
-                }
+                });
+            })
+            .then((result) => {
+                logger.log(this.getIssueUrl(jiraNumber));
+                return result;
             });
-        })
-        .then((result) => {
-            logger.log(this.getIssueUrl(jiraNumber));
-            return result;
-        });
     }
 
 
@@ -615,12 +627,12 @@ class Jira {
                 transitionId: transition.id
             }
         })
-        .then((response) => {
-            let body = response.body;
-            let fields = body.transitions[0].fields;
+            .then((response) => {
+                let body = response.body;
+                let fields = body.transitions[0].fields;
 
-            return this.openFieldQuestions(fields, payload);
-        });
+                return this.openFieldQuestions(fields, payload);
+            });
     }
 
     getTransitionPayload (issue) {
@@ -654,11 +666,11 @@ class Jira {
         }
 
         return this.expandTransitionFields(transition, payload)
-        .then(() => {
-            logger.debug('Payload for transition');
-            logger.debug(JSON.stringify(payload, ' ', 4));
-            return payload;
-        });
+            .then(() => {
+                logger.debug('Payload for transition');
+                logger.debug(JSON.stringify(payload, ' ', 4));
+                return payload;
+            });
     }
 
     continueTransition (issue) {
@@ -667,14 +679,14 @@ class Jira {
         logger.log('Transitioning issue ' + options.jiraNumber + ' to ' + options.transition);
 
         return this.getTransitionPayload(issue)
-        .then((payload) => {
-            return this.api.post('/issue/' + this.api.encode(options.jiraNumber) + '/transitions', {
-                body: payload
+            .then((payload) => {
+                return this.api.post('/issue/' + this.api.encode(options.jiraNumber) + '/transitions', {
+                    body: payload
+                });
+            })
+            .then(() => {
+                logger.log(this.getIssueUrl(options.jiraNumber));
             });
-        })
-        .then(() => {
-            logger.log(this.getIssueUrl(options.jiraNumber));
-        });
     }
 
     transitionAction () {
@@ -690,19 +702,19 @@ class Jira {
                 expand: 'transitions'
             }
         })
-        .then((response) => {
-            issue = response.body;
+            .then((response) => {
+                issue = response.body;
 
-            if (String(options.transition) === 'true') {
-                options.transition = undefined;
-                return this.transitionSelector(issue);
-            }
-        })
-        .then(() => {
-            if (options.transition) {
-                return this.continueTransition(issue);
-            }
-        });
+                if (String(options.transition) === 'true') {
+                    options.transition = undefined;
+                    return this.transitionSelector(issue);
+                }
+            })
+            .then(() => {
+                if (options.transition) {
+                    return this.continueTransition(issue);
+                }
+            });
     }
 
     commentAction () {
@@ -713,10 +725,17 @@ class Jira {
 
     labelAction () {
         var options = this.options;
-        logger.log('Adding label ' + options.label +' to issue ' + logger.colors.green('#' + options.jiraNumber));
+        logger.log('Adding label ' + options.label + ' to issue ' + logger.colors.green('#' + options.jiraNumber));
         return this.label(options.jiraNumber, options.label);
     }
 
+    statusAction () {
+        var options = this.options;
+        this.getStatus(options.jiraNumber)
+            .then(status => {
+                logger.log('Status of issue ' + logger.colors.green('#' + options.jiraNumber) + ' => ' + status);
+            });
+    }
 
     encryptText (text) {
         var cipher = crypto.createCipher(
@@ -842,17 +861,17 @@ class Jira {
                 expand: 'editmeta'
             }
         })
-        .then((response) => {
-            let body = response.body;
-            let editmeta = body.editmeta;
-            let meta = {
-                fields: body.fields
-            };
+            .then((response) => {
+                let body = response.body;
+                let editmeta = body.editmeta;
+                let meta = {
+                    fields: body.fields
+                };
 
-            meta.fieldsMeta = editmeta.fields;
+                meta.fieldsMeta = editmeta.fields;
 
-            return meta;
-        });
+                return meta;
+            });
     }
 
     getNewIssueMeta (projectName, issueType) {
@@ -863,26 +882,26 @@ class Jira {
                 expand: 'projects.issuetypes.fields'
             }
         })
-        .then((response) => {
-            let project = response.body.projects[0];
-            let issueTypes = project.issuetypes;
+            .then((response) => {
+                let project = response.body.projects[0];
+                let issueTypes = project.issuetypes;
 
-            if (!issueTypes || issueTypes.length !== 1 ||
-                issueTypes[0].name !== issueType) {
-                throw 'Issue type not found for the given project.';
-            }
+                if (!issueTypes || issueTypes.length !== 1 ||
+                    issueTypes[0].name !== issueType) {
+                    throw 'Issue type not found for the given project.';
+                }
 
-            let type = issueTypes[0];
+                let type = issueTypes[0];
 
-            let meta = {
-                projectId: project.id,
-                issueTypeId: type.id,
-                fieldsMeta: type.fields,
-                allowedValues: {}
-            };
+                let meta = {
+                    projectId: project.id,
+                    issueTypeId: type.id,
+                    fieldsMeta: type.fields,
+                    allowedValues: {}
+                };
 
-            return meta;
-        });
+                return meta;
+            });
     }
 
     registerLoggerHelpers () {
@@ -902,6 +921,7 @@ Jira.DETAILS = {
         'comment',
         'label',
         'new',
+        'status',
         'transition',
         'update'
     ],

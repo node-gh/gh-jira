@@ -138,6 +138,21 @@ Both Jira and GitHub usernames are supported `--assignee` values.
     gh jira LPS-123 --unassign --transition
     ```
 
+### 5. Status
+
+Option             | Usage        | Type
+---                | ---          | ---
+`--status`         | **Required** | `String`
+
+#### Examples
+
+* Show current status of the issue.
+
+    ```
+    gh jira LPS-123 --status
+    ```
+
+
 ## Testing
 
 Check [Travis](https://travis-ci.org/node-gh/gh-jira) for continuous integration results.
