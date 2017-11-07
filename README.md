@@ -36,7 +36,7 @@ Option             | Usage        | Type
 `-m`, `--message`  | *Optional*   | `String`
 `-P`, `--priority` | *Optional*   | `String`
 `-R`, `--reporter` | *Optional*   | `String`
-`-t`, `--type`     | *Optional*   | `String`
+`-T`, `--type`     | *Optional*   | `String`
 `-v`, `--version`  | *Optional*   | `String`
 
 #### Examples
