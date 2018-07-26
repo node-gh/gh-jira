@@ -49,7 +49,7 @@ class Jira {
 
         // If number was not found yet, use only the first commit message to
         // try to infer the issue number.
-        if (!issue) {
+        if (!issue || config.plugins.jira.inferFromCommitTitle) {
             issue = this.getIssueNumberFromText(git.getCommitMessage(branch, 1));
         }
 
