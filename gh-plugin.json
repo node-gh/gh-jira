@@ -36,6 +36,7 @@
     "password": "",
     "port": "",
     "protocol": "https",
+    "inferFromCommitTitle": true,
     "transition": {
         "Close Issue": {
             "Fix Version/s": true

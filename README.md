@@ -26,18 +26,18 @@ gh jira
 
 ### 1. Create
 
-Option             | Usage        | Type
----                | ---          | ---
-`-N`, `--new`      | **Required** | `Boolean`
-`-p`, `--project`  | **Required** | `String`
-`-t`, `--title`    | **Required** | `String`
-`-A`, `--assignee` | *Optional*   | `String`
-`-C`, `--component`| *Optional*   | `String`
-`-m`, `--message`  | *Optional*   | `String`
-`-P`, `--priority` | *Optional*   | `String`
-`-R`, `--reporter` | *Optional*   | `String`
-`-T`, `--type`     | *Optional*   | `String`
-`-v`, `--version`  | *Optional*   | `String`
+| Option              | Usage        | Type      |
+| ------------------- | ------------ | --------- |
+| `-N`, `--new`       | **Required** | `Boolean` |
+| `-p`, `--project`   | **Required** | `String`  |
+| `-t`, `--title`     | **Required** | `String`  |
+| `-A`, `--assignee`  | *Optional*   | `String`  |
+| `-C`, `--component` | *Optional*   | `String`  |
+| `-m`, `--message`   | *Optional*   | `String`  |
+| `-P`, `--priority`  | *Optional*   | `String`  |
+| `-R`, `--reporter`  | *Optional*   | `String`  |
+| `-T`, `--type`      | *Optional*   | `String`  |
+| `-v`, `--version`   | *Optional*   | `String`  |
 
 #### Examples
 
@@ -67,10 +67,10 @@ Option             | Usage        | Type
 
 ### 2. Comment
 
-Option           | Usage        | Type
----              | ---          | ---
-`-c`, `--comment`| **Required** | `String`
-`-n`, `--number` | **Required** | `Number`
+| Option            | Usage        | Type     |
+| ----------------- | ------------ | -------- |
+| `-c`, `--comment` | **Required** | `String` |
+| `-n`, `--number`  | **Required** | `Number` |
 
 Omitting `--number` will guess issue number from the last commit message.
 
@@ -84,12 +84,17 @@ Omitting `--number` will guess issue number from the last commit message.
 
 ### 3. Open in Browser
 
-Option                 | Usage        | Type
----                    | ---          | ---
-`-B`, `--browser`      | **Required** | `Boolean`
-`-n`, `--number`       | **Required** | `Number`
+| Option            | Usage        | Type      |
+| ----------------- | ------------ | --------- |
+| `-B`, `--browser` | **Required** | `Boolean` |
+| `-n`, `--number`  | **Required** | `Number`  |
 
-Omitting `--number` will guess issue number from the last commit message.
+* Omitting `--number` will guess issue number from the last commit message.
+    * If you would prefer to use the branch as the ticket number you can change this setting in `gh-plugin.json`:
+
+```json
+    "inferFromCommitTitle": false,
+```
 
 #### Examples
 
@@ -101,12 +106,12 @@ Omitting `--number` will guess issue number from the last commit message.
 
 ### 4. Transition
 
-Option             | Usage        | Type
----                | ---          | ---
-`--transition`     | **Required** | `String`
-`-n`, `--number`   | **Required** | `Number`
-`-A`, `--assignee` | *Optional*   | `String`
-`-m`, `--message`  | *Optional*   | `String`
+| Option             | Usage        | Type     |
+| ------------------ | ------------ | -------- |
+| `--transition`     | **Required** | `String` |
+| `-n`, `--number`   | **Required** | `Number` |
+| `-A`, `--assignee` | *Optional*   | `String` |
+| `-m`, `--message`  | *Optional*   | `String` |
 
 Omitting `--number` will guess issue number from the last commit message.
 
@@ -140,9 +145,9 @@ Both Jira and GitHub usernames are supported `--assignee` values.
 
 ### 5. Status
 
-Option             | Usage        | Type
----                | ---          | ---
-`--status`         | **Required** | `String`
+| Option     | Usage        | Type     |
+| ---------- | ------------ | -------- |
+| `--status` | **Required** | `String` |
 
 #### Examples
 
