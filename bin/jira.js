@@ -19,7 +19,7 @@ var git = require(GH_PATH + 'lib/git');
 var inquirer = require('inquirer');
 var lodash = require('lodash');
 var logger = require(GH_PATH + 'lib/logger');
-var openUrl = require('open');
+var openUrl = require('opn');
 var url = require('url');
 var config = base.getConfig(true);
 var RestApiClient = require(GH_PATH + 'lib/rest-api-client');
@@ -263,7 +263,7 @@ class Jira {
     }
 
     browserAction () {
-        openUrl(this.getIssueUrl(this.options.jiraNumber));
+        openUrl(this.getIssueUrl(this.options.jiraNumber), { wait: false });
         return Promise.resolve();
     }
 
