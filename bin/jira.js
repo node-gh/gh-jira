@@ -310,12 +310,13 @@ class Jira {
 
                     if (options[type] !== undefined && fieldValue) {
                         payload.fields[type] = fieldValue;
+                    } else if (field.name === 'Git Pull Request') {
+                        payload.fields[type] = options.submittedLink;
                     }
                 });
 
                 logger.debug('Payload for update');
                 logger.debug(JSON.stringify(payload, ' ', 4));
-
                 return payload;
             });
     }
