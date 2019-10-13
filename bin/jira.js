@@ -23,7 +23,7 @@ var openUrl = require('opn');
 var url = require('url');
 var config = base.getConfig(true);
 var RestApiClient = require(GH_PATH + 'lib/rest-api-client');
-var jiraConfig = config.plugins.jira;
+var jiraConfig = config.plugins.jira || {};
 
 class Jira {
     constructor (options) {
@@ -165,7 +165,8 @@ class Jira {
             })
             .catch((error) => {
                 logger.warn('Not found any user when looking for ' + user);
-                logger.error(error);
+                logger.debug(error);
+                process.exit(1);
             });
     }
 
@@ -401,7 +402,7 @@ class Jira {
         }).then((response) => {
             return response.body.fields.status.name;
         }).catch((err) => {
-            logger.debug(query + ' was not found on Jira.');
+            logger.debug(number + ' was not found on Jira.', err);
         });
     }
 
