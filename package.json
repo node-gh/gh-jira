@@ -38,9 +38,9 @@
         "opn": "^5.3.0"
     },
     "devDependencies": {
-        "babel": "^5.8",
+        "babel": "^6.23",
         "jshint": "^2.8.0",
-        "mocha": "^2.3.3"
+        "mocha": "^10.1.0"
     },
     "engines": {
         "node": ">=0.12"
